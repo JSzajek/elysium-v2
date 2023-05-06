@@ -1,0 +1,89 @@
+#include "elysium_pch.h"
+#include "RendererBase.h"
+
+namespace Elysium
+{
+	Unique<GlobalObjects> GlobalRendererBase::s_globals = CreateUnique<GlobalObjects>();
+
+	void GlobalRendererBase::Initialize()
+	{
+		if (!s_globals->s_initialized)
+		{
+			s_globals->ScreenQuad = VertexArray::Create();
+			float quadVertices[] =
+			{
+				// positions   // texture Coords
+			   -1.0f,  1.0f,  0.0f, 1.0f,
+			   -1.0f, -1.0f,  0.0f, 0.0f,
+				1.0f, -1.0f,  1.0f, 0.0f,
+
+			   -1.0f,  1.0f,  0.0f, 1.0f,
+				1.0f, -1.0f,  1.0f, 0.0f,
+				1.0f,  1.0f,  1.0f, 1.0f
+			};
+			auto m_vbo = VertexBuffer::Create(quadVertices, 6 * 4 * sizeof(float));
+			BufferLayout layout =
+			{
+				{ ShaderDataType::Float2,	"a_Position" },
+				{ ShaderDataType::Float2,	"a_TextureCoords" },
+			};
+			m_vbo->SetLayout(layout);
+			s_globals->ScreenQuad->AddVertexBuffer(m_vbo);
+
+			s_globals->WhiteTexture = Texture2D::Create(1, 1);
+			uint32_t whiteTextureData = 0xffffffff;
+			s_globals->WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+		}
+	}
+
+	void RendererBase::ResetTextureSlot()
+	{
+		TextureSlotIndex = TEXTURE_SLOT_USER_POINT;
+	}
+
+	void RendererBase::BindTextures()
+	{
+		GlobalRendererBase::GetDefaultTexture()->Bind(TEXTURE_SLOT_DEFAULT);
+
+		// Bind Textures
+		for (unsigned int i = TEXTURE_SLOT_USER_POINT; i < TextureSlotIndex; ++i)
+			TextureSlots[i]->Bind(i);
+	}
+
+	uint16_t RendererBase::FindTextureIndex(const Shared<Texture2D>& texture)
+	{
+		uint16_t textureIndex = 0;
+		if (texture)
+		{
+			// Push back texture for binding
+			for (uint16_t i = TEXTURE_SLOT_USER_POINT; i < TextureSlotIndex; ++i)
+			{
+				if (*TextureSlots[i] == *texture)
+				{
+					textureIndex = i;
+					break;
+				}
+			}
+
+			if (textureIndex == 0)
+			{
+				if (TextureSlotIndex + 1 > RendererCaps::MaxTextureSlots)
+					return -1;
+
+				textureIndex = TextureSlotIndex;
+				TextureSlots[TextureSlotIndex++] = texture;
+			}
+		}
+		return textureIndex;
+	}
+
+	RendererStatistics RendererBase::GetStatistics()
+	{
+		return Statistics;
+	}
+
+	void RendererBase::ResetStatistics()
+	{
+		memset(&Statistics, 0, sizeof(RendererStatistics));
+	}
+}
