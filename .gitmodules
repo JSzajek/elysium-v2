@@ -4,3 +4,6 @@
 [submodule "vendor/spdlog"]
 	path = vendor/spdlog
 	url = https://gitlab.com/jszajek/spdlog-fork.git
+[submodule "vendor/yaml-cpp"]
+	path = vendor/yaml-cpp
+	url = https://gitlab.com/jszajek/yaml-cpp-fork.git
