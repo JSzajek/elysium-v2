@@ -70,9 +70,6 @@
     <Filter Include="vendor\stb_image">
       <UniqueIdentifier>{0DA0BA59-F998-D9AB-22CB-BE300E23B9B7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vendor\stb_image\stb_image">
-      <UniqueIdentifier>{E784F27D-D394-9E4E-3C4E-036D287D8DE7}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Contexts\OpenGL\OpenGLBuffer.h">
@@ -366,11 +363,11 @@
     <ClInclude Include="vendor\imnodes\imnodes_internal.h">
       <Filter>vendor\imnodes</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\stb_image\stb_image\stb_image.h">
-      <Filter>vendor\stb_image\stb_image</Filter>
+    <ClInclude Include="vendor\stb_image\stb_image.h">
+      <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\stb_image\stb_image\stb_image_write.h">
-      <Filter>vendor\stb_image\stb_image</Filter>
+    <ClInclude Include="vendor\stb_image\stb_image_write.h">
+      <Filter>vendor\stb_image</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -575,16 +572,34 @@
     <ClCompile Include="vendor\imnodes\imnodes.cpp">
       <Filter>vendor\imnodes</Filter>
     </ClCompile>
-    <ClCompile Include="vendor\stb_image\stb_image\stb_image.cpp">
-      <Filter>vendor\stb_image\stb_image</Filter>
+    <ClCompile Include="vendor\stb_image\stb_image.cpp">
+      <Filter>vendor\stb_image</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="vendor\imgui\ImGui.vcxproj">
+      <Filter>vendor\imgui</Filter>
+    </None>
     <None Include="vendor\imgui\LICENSE.txt">
       <Filter>vendor\imgui</Filter>
     </None>
+    <None Include="vendor\imgui\premake5.lua">
+      <Filter>vendor\imgui</Filter>
+    </None>
+    <None Include="vendor\imguizmo\ImGuizmo.vcxproj">
+      <Filter>vendor\imguizmo</Filter>
+    </None>
     <None Include="vendor\imguizmo\LICENSE">
       <Filter>vendor\imguizmo</Filter>
+    </None>
+    <None Include="vendor\imguizmo\premake5.lua">
+      <Filter>vendor\imguizmo</Filter>
+    </None>
+    <None Include="vendor\imnodes\ImNodes.vcxproj">
+      <Filter>vendor\imnodes</Filter>
+    </None>
+    <None Include="vendor\imnodes\premake5.lua">
+      <Filter>vendor\imnodes</Filter>
     </None>
   </ItemGroup>
 </Project>

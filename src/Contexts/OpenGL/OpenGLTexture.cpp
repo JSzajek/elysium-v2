@@ -6,7 +6,7 @@
 
 #include "Elysium/Utils/FileUtils.h"
 
-#include <stb_image/stb_image.h>
+#include <stb_image.h>
 #include <gl/glew.h>
 
 namespace Elysium
