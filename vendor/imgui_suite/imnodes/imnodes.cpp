@@ -1,5 +1,3 @@
-#include "elysium_pch.h"
-
 // the structure of this file:
 //
 // [SECTION] bezier curve helpers

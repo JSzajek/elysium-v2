@@ -1,25 +1,22 @@
-project "ImGuizmo"
+include "../imgui_dependencies.lua"
+
+project "ImNodes"
 	kind "StaticLib"
 	language "C++"
 
-	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+	targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
 	files
 	{
-		"ImGuizmo.h",
-		"ImGuizmo.cpp",
-		"ImSequencer.h",
-		"ImSequencer.cpp",
-		"ImGradient.cpp",
-		"ImGradient.h",
-		"ImCurveEdit.h",
-		"ImCurveEdit.cpp"
+		"imnodes.h",
+		"imnodes.cpp",
+		"imnodes_internal.h"
 	}
 
 	includedirs
 	{
-		"include"
+		"%{ImGui_IncludeDir.ImGui}",
 	}
 
 	filter "system:windows"

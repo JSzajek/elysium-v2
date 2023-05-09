@@ -1,4 +1,5 @@
 include "elysium_dependencies.lua"
+include "vendor/imgui_suite/imgui_dependencies.lua"
 
 require('vstudio')
 
@@ -45,10 +46,6 @@ project "Elysium"
 
 		"vendor/stb_image/**.h",
 		"vendor/stb_image/**.cpp",
-
-		"vendor/imgui/**",
-		"vendor/imguizmo/**",
-		"vendor/imnodes/**",
 	}
 
 	includedirs
@@ -57,9 +54,9 @@ project "Elysium"
 		
 		"vendor/spdlog/include",
 		
-		"%{IncludeDir.ImGui}",
-		"%{IncludeDir.ImGuizmo}",
-		"%{IncludeDir.ImNodes}",
+		"%{ImGui_IncludeDir.ImGui}",
+		"%{ImGui_IncludeDir.ImGuizmo}",
+		"%{ImGui_IncludeDir.ImNodes}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.IconFontCppHeaders}",
 		"%{IncludeDir.stduuid}",
@@ -69,12 +66,16 @@ project "Elysium"
 	
 	libdirs
 	{
+
 	}
 	
 	links
 	{
 		--"glew",
-		--"opengl32.lib",
+		"opengl32.lib",
+		"ImGui",
+		"ImGuizmo",
+		"ImNodes",
 		"yaml-cpp"
 	}
 

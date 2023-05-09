@@ -1,5 +1,3 @@
-#include "elysium_pch.h"
-
 #include "ImCurveEdit.h"
 #include "imgui.h"
 #include "imgui_internal.h"

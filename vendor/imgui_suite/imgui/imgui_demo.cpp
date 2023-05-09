@@ -1,5 +1,3 @@
-#include "elysium_pch.h"
-
 // dear imgui, v1.79 WIP
 // (demo code)
 
