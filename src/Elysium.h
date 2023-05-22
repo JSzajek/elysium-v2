@@ -19,6 +19,7 @@
 #include "Elysium/Utils/FileUtils.h"
 #include "Elysium/Utils/StringUtils.h"
 #include "Elysium/Utils/YamlUtils.h"
+#include "Elysium/Utils/PlatformUtils.h"
 
 #include "Elysium/Pipeline/Application.h"
 #include "Elysium/Pipeline/Layer.h"
@@ -30,9 +31,13 @@
 #include "Elysium/Graphics/Texture.h"
 #include "Elysium/Graphics/Shader.h"
 #include "Elysium/Graphics/Camera.h"
+#include "Elysium/Graphics/GraphicsCalls.h"
+#include "Elysium/Graphics/RenderCommands.h"
 
 #include "Elysium/Renderer/RendererDefines.h"
 
 #include "Elysium/Scene/Scene.h"
 #include "Elysium/Scene/Time.h"
+#include "Elysium/Scene/Entity.h"
 #include "Elysium/Scene/CoreUniformBuffers.h"
+#include "Elysium/Scene/2DComponents.h"

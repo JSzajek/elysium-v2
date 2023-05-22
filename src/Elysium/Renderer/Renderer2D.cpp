@@ -1,5 +1,5 @@
 #include "elysium_pch.h"
-#include "Renderer2D.h"
+#include "Elysium/Renderer/Renderer2D.h"
 
 #include "Elysium/Scene/2DComponents.h"
 #include "Elysium/Factories/ShaderFactory.h"
@@ -29,25 +29,8 @@ namespace Elysium
 		m_QuadVAO->AddVertexBuffer(m_QuadVBO);
 
 		m_QuadVertexBufferBase = new QuadVertex[RendererCaps::MaxVertices];
-		uint32_t* quadIndices = new uint32_t[RendererCaps::MaxIndices];
-
-		// Generate Standard Indices
-		uint32_t offset = 0;
-		for (uint32_t i = 0; i < RendererCaps::MaxIndices; i += 6)
-		{
-			quadIndices[i + 0] = offset + 0;
-			quadIndices[i + 1] = offset + 1;
-			quadIndices[i + 2] = offset + 2;
-
-			quadIndices[i + 3] = offset + 2;
-			quadIndices[i + 4] = offset + 3;
-			quadIndices[i + 5] = offset + 0;
-			offset += 4;
-		}
-
-		Shared<IndexBuffer> ibo = IndexBuffer::Create(quadIndices, RendererCaps::MaxIndices);
-		m_QuadVAO->SetIndexBuffer(ibo);
-		delete[] quadIndices;
+		
+		m_QuadVAO->SetIndexBuffer(GlobalRendererBase::GetDefaultQuadIndices());
 	}
 
 	void Renderer2D::ShutDown()

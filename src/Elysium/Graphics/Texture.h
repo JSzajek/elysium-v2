@@ -34,13 +34,14 @@ namespace Elysium
 	class Texture2D : public Texture
 	{
 	public:
+		static std::shared_ptr<Texture2D> Create(uint32_t id, uint32_t width, uint32_t height);
 		static std::shared_ptr<Texture2D> Create(uint32_t width, uint32_t height);
 		static std::shared_ptr<Texture2D> Create(uint32_t id, uint32_t width, uint32_t height, unsigned int internalFormat, unsigned int dataFormat, unsigned int type, unsigned int samples);
 		static std::shared_ptr<Texture2D> Create(const std::string& path);
 		static std::shared_ptr<Texture2D> Create(const TextureFormat& format);
 		static std::shared_ptr<Texture2D> Create(const TextureFormat& format, const void* data);
 
-		virtual void Resize(uint32_t width, uint32_t height) = 0;
+		virtual void Resize(uint32_t width, uint32_t height, PixelAlignment alignment = PixelAlignment::NotSpecified) = 0;
 
 		void Reimport(const Texture2DOutline* mData, const std::string& outputFilepath) { Reimport(mData); WriteToFile(mData, outputFilepath); }
 		virtual void Reimport(const Texture2DOutline* mData) = 0;

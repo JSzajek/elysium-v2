@@ -2,12 +2,6 @@
 
 #include "Elysium/Renderer/RendererBase.h"
 
-#include "Elysium/Core/Memory.h"
-
-#include "Elysium/Graphics/VertexArray.h"
-#include "Elysium/Graphics/Buffer.h"
-#include "Elysium/Graphics/Shader.h"
-
 namespace Elysium
 {
 	class Renderer2D : protected RendererBase

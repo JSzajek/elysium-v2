@@ -64,4 +64,27 @@ namespace Elysium
 	struct LabelComponent
 	{
 	};
+
+	struct GizmoRectComponent
+	{
+	public:
+		GizmoRectComponent();
+		GizmoRectComponent(const GizmoRectComponent& copy) = default;
+	public:
+		void SetTranslation(const Math::Vec2& translation);
+		void SetDimensions(const Math::Vec2& dimensions);
+	public:
+		inline Math::Vec2 GetTranslation() const { return m_translation; }
+		inline Math::Vec2 GetDimensions() const { return m_dimensions; }
+	public:
+		Math::Vec4 Color = Math::Vec4::One;
+		float LineWidth = 1;
+	private:
+		Math::Vec2 m_translation;
+		Math::Vec2 m_dimensions;
+	};
+
+	struct GizmoSpriteComponent
+	{
+	};
 }

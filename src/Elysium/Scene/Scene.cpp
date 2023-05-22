@@ -9,6 +9,7 @@
 #include "Elysium/Scene/2DComponents.h"
 
 #include "Elysium/Renderer/Renderer2D.h"
+#include "Elysium/Renderer/RendererGizmo.h"
 
 namespace Elysium
 {
@@ -17,6 +18,9 @@ namespace Elysium
 	{
 		m_renderer2D = CreateUnique<Renderer2D>();
 		m_renderer2D->Initialize();
+
+		m_rendererGizmo = CreateUnique<RendererGizmo>();
+		m_rendererGizmo->Initialize();
 	}
 
 	Scene::~Scene()
@@ -49,18 +53,42 @@ namespace Elysium
 	{
 		switch (mask)
 		{
-			case _2D:
+			case SceneMask::_2D:
 			{
 				m_renderer2D->BeginScene();
 
-				auto panelGroup = m_registry->group(entt::get<RectTransformComponent, SpriteComponent>);
-				for (auto entity : panelGroup)
+				auto spriteGroup = m_registry->group(entt::get<RectTransformComponent, SpriteComponent>);
+				for (auto entity : spriteGroup)
 				{
-					auto [transform, sprite] = panelGroup.get<RectTransformComponent, SpriteComponent>(entity);
+					auto [transform, sprite] = spriteGroup.get<RectTransformComponent, SpriteComponent>(entity);
 					m_renderer2D->DrawSprite(transform, sprite);
 				}
 
 				m_renderer2D->EndScene();
+				break;
+			}
+			case SceneMask::Gizmo2D:
+			{
+				m_rendererGizmo->BeginScene();
+				
+				auto gizmoRectView = m_registry->view<GizmoRectComponent>();
+
+				std::unordered_map<float, std::vector<GizmoRectComponent>> rects;
+				for (auto entity : gizmoRectView)
+				{
+					auto rect = gizmoRectView.get<GizmoRectComponent>(entity);
+					rects[rect.LineWidth].emplace_back(rect);
+				}
+
+				for (const auto& [lineWidth, components] : rects)
+				{
+					m_rendererGizmo->SetLineWidth(lineWidth);
+
+					for (const auto& comp : components)
+						m_rendererGizmo->Draw(comp);
+				}
+
+				m_rendererGizmo->EndScene();
 				break;
 			}
 		}
@@ -99,6 +127,11 @@ namespace Elysium
 	{
 	}
 
+	template<>
+	void Scene::OnComponentAdded<GizmoRectComponent>(Entity entity, GizmoRectComponent& component)
+	{
+	}
+
 #pragma endregion
 
 #pragma region OnComponentRemove
@@ -130,6 +163,11 @@ namespace Elysium
 
 	template<>
 	void Scene::OnComponentRemove<SpriteComponent>(Entity entity, SpriteComponent& component)
+	{
+	}
+
+	template<>
+	void Scene::OnComponentRemove<GizmoRectComponent>(Entity entity, GizmoRectComponent& component)
 	{
 	}
 

@@ -1,5 +1,5 @@
 #include "elysium_pch.h"
-#include "RendererBase.h"
+#include "Elysium/Renderer/RendererBase.h"
 
 namespace Elysium
 {
@@ -33,6 +33,25 @@ namespace Elysium
 			s_globals->WhiteTexture = Texture2D::Create(1, 1);
 			uint32_t whiteTextureData = 0xffffffff;
 			s_globals->WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+
+			uint32_t* quadIndices = new uint32_t[RendererCaps::MaxIndices];
+
+			// Generate Standard Indices
+			uint32_t offset = 0;
+			for (uint32_t i = 0; i < RendererCaps::MaxIndices; i += 6)
+			{
+				quadIndices[i + 0] = offset + 0;
+				quadIndices[i + 1] = offset + 1;
+				quadIndices[i + 2] = offset + 2;
+
+				quadIndices[i + 3] = offset + 2;
+				quadIndices[i + 4] = offset + 3;
+				quadIndices[i + 5] = offset + 0;
+				offset += 4;
+			}
+
+			s_globals->DefaultQuadIndices = IndexBuffer::Create(quadIndices, RendererCaps::MaxIndices);
+			delete[] quadIndices;
 		}
 	}
 

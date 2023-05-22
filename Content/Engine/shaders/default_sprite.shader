@@ -14,8 +14,6 @@ struct VertexOutput
 	vec2 TexCoordinates;
 };
 
-uniform mat4 projMatrix;
-
 layout(location = 0) out VertexOutput v_Output;
 layout(location = 2) out flat int v_IsFont;
 layout(location = 3) out flat int v_TexIndex;

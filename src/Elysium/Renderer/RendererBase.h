@@ -6,6 +6,7 @@
 
 #include "Elysium/Graphics/Texture.h"
 #include "Elysium/Graphics/VertexArray.h"
+#include "Elysium/Graphics/Shader.h"
 
 #include "Elysium/Renderer/RendererDefines.h"
 
@@ -17,6 +18,8 @@ namespace Elysium
 		bool s_initialized = false;
 		Shared<Texture2D> WhiteTexture = nullptr;
 		Shared<VertexArray> ScreenQuad = nullptr;
+
+		Shared<IndexBuffer> DefaultQuadIndices = nullptr;
 	};
 
 	struct RendererStatistics
@@ -40,6 +43,8 @@ namespace Elysium
 	public:
 		static void Initialize();
 		static inline const Shared<Texture2D> GetDefaultTexture() { return s_globals->WhiteTexture; }
+		static inline const Shared<VertexArray> GetScreenQuad() { return s_globals->ScreenQuad; }
+		static inline const Shared<IndexBuffer> GetDefaultQuadIndices() { return s_globals->DefaultQuadIndices; }
 	};
 
 	class RendererBase

@@ -29,13 +29,19 @@ namespace Elysium
 		GraphicsCalls::SetDepthTesting(true);
 	}
 
-	void RenderCommands::DrawTexture(const Shared<FrameBuffer>& output, TextureDrawType type, const Shared<Texture2D>& texture)
+	void RenderCommands::DrawTexture(const Shared<FrameBuffer>& output, TextureDrawType type, 
+									 const Shared<Texture2D>& texture, const Shared<Shader>& drawShader)
 	{
 		GraphicsCalls::SetDepthTesting(false);
 		output->Bind();
 
 		s_data.m_vao->Bind();
-		s_data.m_screenShader->Bind();
+
+		if (drawShader.get() == nullptr)
+			s_data.m_screenShader->Bind();
+		else
+			drawShader->Bind();
+
 		texture->Bind();
 		GraphicsCalls::DrawTriangles(6);
 

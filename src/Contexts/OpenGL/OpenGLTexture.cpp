@@ -11,37 +11,54 @@
 
 namespace Elysium
 {
-	static GLenum ConvertWrapMode(WrapMode mode)
+	namespace TexUtils
 	{
-		switch (mode)
+		GLenum ConvertWrapMode(WrapMode mode)
 		{
-		case WrapMode::Repeat:
-			return GL_REPEAT;
-		case WrapMode::ClampBorder:
-			return GL_CLAMP_TO_BORDER;
-		case WrapMode::ClampEdge:
-			return GL_CLAMP_TO_EDGE;
-		case WrapMode::Mirror:
-			return GL_MIRRORED_REPEAT;
-		case WrapMode::MirrorOnce:
-			return GL_MIRROR_CLAMP_TO_EDGE;
+			switch (mode)
+			{
+			case WrapMode::Repeat:
+				return GL_REPEAT;
+			case WrapMode::ClampBorder:
+				return GL_CLAMP_TO_BORDER;
+			case WrapMode::ClampEdge:
+				return GL_CLAMP_TO_EDGE;
+			case WrapMode::Mirror:
+				return GL_MIRRORED_REPEAT;
+			case WrapMode::MirrorOnce:
+				return GL_MIRROR_CLAMP_TO_EDGE;
+			}
+			ELYSIUM_CORE_ASSERT(false);
+			return 0;
 		}
-		ELYSIUM_CORE_ASSERT(false);
-		return 0;
+
+		GLenum ConvertFilterMode(FilterMode mode)
+		{
+			switch (mode)
+			{
+			case FilterMode::Linear:
+				return GL_LINEAR;
+			case FilterMode::Nearest:
+				return GL_NEAREST;
+			}
+			ELYSIUM_CORE_ASSERT(false);
+			return 0;
+		}
+
+		PixelAlignment TextureWidthToPixelAlignment(uint32_t width)
+		{
+			// NOTE:: 8 byte alignment is too specialized of a use case to utilize.
+
+			if (width % 4 == 0)
+				return PixelAlignment::WordAligned;
+			else if (width % 2 == 0)
+				return PixelAlignment::RowAligned;
+			else
+				return PixelAlignment::Byte;
+		}
 	}
 
-	static GLenum ConvertFilterMode(FilterMode mode)
-	{
-		switch (mode)
-		{
-		case FilterMode::Linear:
-			return GL_LINEAR;
-		case FilterMode::Nearest:
-			return GL_NEAREST;
-		}
-		ELYSIUM_CORE_ASSERT(false);
-		return 0;
-	}
+	
 
 	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
 		: m_debugpath(), m_width(width), m_height(height), m_uuid()
@@ -58,7 +75,9 @@ namespace Elysium
 		m_dataFormat = format;
 		m_internalFormat = internalFormat;
 
-		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, nullptr);
+		m_type = GL_UNSIGNED_BYTE;
+
+		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, format, m_type, nullptr);
 
 		glTextureParameteri(m_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTextureParameteri(m_id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -81,40 +100,10 @@ namespace Elysium
 
 		const std::string solvedFilepath = FileUtils::GetAssetPath_Str(filepath);
 
-		int width, height, nrComponents;
-		stbi_set_flip_vertically_on_load(true);
-		stbi_uc* data = NULL;
-		{
-			ELYSIUM_PROFILE_SCOPE("stbi_load - OpenGLTexture2D::OpenGLTexture2D(const std::string&)");
-			data = stbi_load(solvedFilepath.c_str(), &width, &height, &nrComponents, 0);
-		}
-		ELYSIUM_CORE_ASSERT(data, "Failed to load image texture.");
-		
-		m_width = width;
-		m_height = height;
-		
-		glGenTextures(1, &m_id);
-		glBindTexture(GL_TEXTURE_2D, m_id);
-		
-		//TODO::Determine correct formats for nrComponents 2 (aka Grey and Alpha)
-		// Example image is within .default_assets/textures/Test_NR2.png
-		// https://www.khronos.org/opengl/wiki/Image_Format
-		
-		GLenum internalFormat = nrComponents == 1 ? GL_RGB8 : nrComponents == 3 ? GL_RGB8 : GL_RGBA8;
-		GLenum format = nrComponents == 1 ? GL_RED : nrComponents == 3 ? GL_RGB : GL_RGBA;
+		TextureFormat format;
+		format.FilePath = solvedFilepath;
 
-		m_dataFormat = format;
-		m_internalFormat = internalFormat;
-
-		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, data);
-
-		glTextureParameteri(m_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTextureParameteri(m_id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTextureParameteri(m_id, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTextureParameteri(m_id, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		
-		glBindTexture(GL_TEXTURE_2D, 0);
-		stbi_image_free(data);
+		Initialize(format);
 	}
 
 	OpenGLTexture2D::OpenGLTexture2D(const TextureFormat& format)
@@ -132,41 +121,7 @@ namespace Elysium
 	{
 		m_debugpath = format.FilePath;
 	
-		m_width = format.Size.x;
-		m_height = format.Size.y;
-
-		ELYSIUM_PROFILE_FUNCTION();
-
-		if (format.PixelFormat != 4)
-			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		
-		glGenTextures(1, &m_id);
-		glBindTexture(GL_TEXTURE_2D, m_id);
-
-		auto nrComponents = format.PixelFormat != 4 ? 1 : 4; // Move to parameter?
-		GLenum internalFormat = nrComponents == 1 ? GL_R8 : nrComponents == 3 ? GL_RGB8 : GL_RGBA8;
-		GLenum dataFormat = nrComponents == 1 ? GL_RED : nrComponents == 3 ? GL_RGB : GL_RGBA;
-
-		m_dataFormat = dataFormat;
-		m_internalFormat = internalFormat;
-
-		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
-		
-		// Filter Mode
-		auto filtermode = ConvertFilterMode(format.Filter);
-		glTextureParameteri(m_id, GL_TEXTURE_MIN_FILTER, filtermode);
-		glTextureParameteri(m_id, GL_TEXTURE_MAG_FILTER, filtermode);
-
-		// Wrap Mode
-		auto wrapmode = ConvertWrapMode(format.Wrap);
-		glTextureParameteri(m_id, GL_TEXTURE_WRAP_S, wrapmode);
-		glTextureParameteri(m_id, GL_TEXTURE_WRAP_T, wrapmode);
-		glTextureParameteri(m_id, GL_TEXTURE_WRAP_R, wrapmode);
-
-		if (format.PixelFormat != 4)
-			glPixelStorei(GL_UNPACK_ALIGNMENT, 4); // Reset unpacking alignment to default
-
-		glBindTexture(GL_TEXTURE_2D, 0);
+		Initialize(format, data);
 	}
 
 	OpenGLTexture2D::~OpenGLTexture2D()
@@ -181,14 +136,7 @@ namespace Elysium
 		int width, height, nrComponents;
 		void* data = nullptr;
 
-		if (!format.FilePath.size())
-		{
-			m_width = format.Size.x;
-			m_height = format.Size.y;
-
-			nrComponents = 4; // Move to parameter?
-		}
-		else
+		if (!format.FilePath.empty())
 		{
 			stbi_set_flip_vertically_on_load(format.Flipped);
 			{
@@ -201,120 +149,110 @@ namespace Elysium
 			m_height = height;
 		}
 
-		if (format.PixelFormat != 4)
-			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		Initialize(format, data);
+
+		if (data)
+			stbi_image_free(data);
+	}
+
+	void OpenGLTexture2D::Initialize(const TextureFormat& format, const void* data)
+	{
+		m_width = format.Size.x;
+		m_height = format.Size.y;
+
+		ELYSIUM_PROFILE_FUNCTION();
+
+		if (format.Alignment != PixelAlignment::NotSpecified)
+			m_pixelAlignment = format.Alignment;
+		else
+			m_pixelAlignment = TexUtils::TextureWidthToPixelAlignment(m_width);
+
+		glPixelStorei(GL_UNPACK_ALIGNMENT, m_pixelAlignment);
 
 		glGenTextures(1, &m_id);
 		glBindTexture(GL_TEXTURE_2D, m_id);
 
-		GLenum internalFormat;
-		if (format.sRGB)
-		{
-			internalFormat = nrComponents == 1 ? GL_SRGB8 : nrComponents == 3 ? GL_SRGB8 : GL_SRGB8_ALPHA8;
-		}
-		else
-		{
-			internalFormat = nrComponents == 1 ? GL_RGB8 : nrComponents == 3 ? GL_RGB8 : GL_RGBA8;
-		}
-		GLenum dataformat = nrComponents == 1 ? GL_RED : nrComponents == 3 ? GL_RGB : GL_RGBA;
+		// NOTE:: Assumed only 8-bit formats
+		m_type = GL_UNSIGNED_BYTE;
 
-		m_dataFormat = dataformat;
-		m_internalFormat = internalFormat;
+		switch (format.Format)
+		{
+			case PixelFormat::R_8:
+			{
+				m_internalFormat = GL_R8;
+				m_dataFormat = GL_RED;
+				break;
+			}
+			case PixelFormat::R8G8:
+			{
+				m_internalFormat = GL_RG8;
+				m_dataFormat = GL_RG;
+				break;
+			}
+			case PixelFormat::R8G8B8:
+			{
+				m_internalFormat = GL_RGB8;
+				m_dataFormat = GL_RGB;
+				break;
+			}
+			case PixelFormat::RGBA_8:
+			{
+				m_internalFormat = GL_RGBA8;
+				m_dataFormat = GL_RGBA;
+				break;
+			}
+		}
 
-		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, dataformat, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, m_internalFormat, m_width, m_height, 0, m_dataFormat, m_type, data);
 
 		// Filter Mode
-		auto filtermode = ConvertFilterMode(format.Filter);
+		auto filtermode = TexUtils::ConvertFilterMode(format.Filter);
 		glTextureParameteri(m_id, GL_TEXTURE_MIN_FILTER, filtermode);
 		glTextureParameteri(m_id, GL_TEXTURE_MAG_FILTER, filtermode);
 
 		// Wrap Mode
-		auto wrapmode = ConvertWrapMode(format.Wrap);
+		auto wrapmode = TexUtils::ConvertWrapMode(format.Wrap);
 		glTextureParameteri(m_id, GL_TEXTURE_WRAP_S, wrapmode);
 		glTextureParameteri(m_id, GL_TEXTURE_WRAP_T, wrapmode);
 		glTextureParameteri(m_id, GL_TEXTURE_WRAP_R, wrapmode);
 
-		if (format.PixelFormat != 4)
-			glPixelStorei(GL_UNPACK_ALIGNMENT, 4); // Reset unpacking alignment to default
+		// Reset unpacking alignment to default
+		glPixelStorei(GL_UNPACK_ALIGNMENT, (uint8_t)PixelAlignment::WordAligned);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
-
-		if (data)
-			stbi_image_free(data);
 	}
 
 	void OpenGLTexture2D::Initialize(const Texture2DOutline* mData)
 	{
-		int width, height, nrComponents;
-		void* data = nullptr;
+		TextureFormat format;
+		format.FilePath = mData->Filepath;
+		format.Size = mData->Size;
 
-		if (!mData->Filepath.size())
-		{
-			m_width = mData->Size.x;
-			m_height = mData->Size.y;
+		format.Type = static_cast<TextureType>(mData->TextureType);
+		format.Shape = static_cast<TextureShape>(mData->TextureShape);
 
-			nrComponents = 4; // Move to parameter?
-		}
-		else
-		{
-			stbi_set_flip_vertically_on_load(mData->Flipped);
-			{
-				ELYSIUM_PROFILE_SCOPE("stbi_load - OpenGLTexture2D::OpenGLTexture2D(const std::string&)");
-				data = stbi_load(mData->Filepath.c_str(), &width, &height, &nrComponents, 0);
-			}
-			ELYSIUM_CORE_ASSERT(data, "Failed to load image texture.");
+		format.sRGB = mData->sRGB;
+		format.Flipped = mData->Flipped;
+		format.Source = static_cast<AlphaSource>(mData->AlphaSource);
+		format.AlphaTransparency = mData->AlphaTransparency;
+		format.Wrap = static_cast<WrapMode>(mData->WrapMode);
+		format.Filter = static_cast<FilterMode>(mData->FilterMode);
+		
+		format.Format = static_cast<PixelFormat>(mData->PixelFormat);
 
-			m_width = width;
-			m_height = height;
-		}
-
-		if (mData->PixelFormat != 4)
-			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-		glGenTextures(1, &m_id);
-		glBindTexture(GL_TEXTURE_2D, m_id);
-
-		GLenum internalFormat;
-		if (mData->sRGB)
-		{
-			internalFormat = nrComponents == 1 ? GL_SRGB8 : nrComponents == 3 ? GL_SRGB8 : GL_SRGB8_ALPHA8;
-		}
-		else
-		{
-			internalFormat = nrComponents == 1 ? GL_RGB8 : nrComponents == 3 ? GL_RGB8 : GL_RGBA8;
-		}
-		GLenum dataformat = nrComponents == 1 ? GL_RED : nrComponents == 3 ? GL_RGB : GL_RGBA;
-
-		m_dataFormat = dataformat;
-		m_internalFormat = internalFormat;
-
-		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, dataformat, GL_UNSIGNED_BYTE, data);
-
-		// Filter Mode
-		auto filtermode = ConvertFilterMode((FilterMode)mData->FilterMode);
-		glTextureParameteri(m_id, GL_TEXTURE_MIN_FILTER, filtermode);
-		glTextureParameteri(m_id, GL_TEXTURE_MAG_FILTER, filtermode);
-
-		// Wrap Mode
-		auto wrapmode = ConvertWrapMode((WrapMode)mData->WrapMode);
-		glTextureParameteri(m_id, GL_TEXTURE_WRAP_S, wrapmode);
-		glTextureParameteri(m_id, GL_TEXTURE_WRAP_T, wrapmode);
-		glTextureParameteri(m_id, GL_TEXTURE_WRAP_R, wrapmode);
-
-		if (mData->PixelFormat != 4)
-			glPixelStorei(GL_UNPACK_ALIGNMENT, 4); // Reset unpacking alignment to default
-
-		glBindTexture(GL_TEXTURE_2D, 0);
-
-		if (data)
-			stbi_image_free(data);
+		Initialize(format);
 	}
 
-	void OpenGLTexture2D::Resize(uint32_t width, uint32_t height)
+	void OpenGLTexture2D::Resize(uint32_t width, uint32_t height, PixelAlignment alignment)
 	{
 		m_width = width;
 		m_height = height;
-		
+
+		if (alignment != PixelAlignment::NotSpecified)
+			m_pixelAlignment = alignment;
+		else
+			m_pixelAlignment = TexUtils::TextureWidthToPixelAlignment(m_width);
+
 		if (m_samples > 1)
 		{
 			glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_id);
@@ -349,10 +287,15 @@ namespace Elysium
 
 		glBindTexture(GL_TEXTURE_2D, m_id);
 
-		unsigned int bpp = m_dataFormat == GL_RED ? 1 : m_dataFormat == GL_RGB ? 3 : 4;
+		glPixelStorei(GL_UNPACK_ALIGNMENT, m_pixelAlignment);
+
+		const uint32_t bpp = m_dataFormat == GL_RED ? 1 : m_dataFormat == GL_RGB ? 3 : 4;
 		ELYSIUM_CORE_ASSERT(size == m_width * m_height * bpp, "Data Does Not Cover Entire Texture.");
 
-		glTextureSubImage2D(m_id, 0, 0, 0, m_width, m_height, m_dataFormat, GL_UNSIGNED_BYTE, data);
+		glTextureSubImage2D(m_id, 0, 0, 0, m_width, m_height, m_dataFormat, m_type, data);
+		
+		glPixelStorei(GL_UNPACK_ALIGNMENT, PixelAlignment::WordAligned);
+		
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 

@@ -27,6 +27,7 @@ namespace Elysium
 	private:
 		Unique<entt::registry> m_registry;
 		Unique<class Renderer2D> m_renderer2D;
+		Unique<class RendererGizmo> m_rendererGizmo;
 
 		friend Entity;
 	public:

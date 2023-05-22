@@ -19,6 +19,7 @@ namespace Elysium
 		~OpenGLTexture2D() override;
 	public:
 		void Initialize(const TextureFormat& format);
+		void Initialize(const TextureFormat& format, const void* data);
 		void Initialize(const Texture2DOutline* mData);
 
 		virtual uint32_t GetWidth() const override { return m_width; }
@@ -29,7 +30,7 @@ namespace Elysium
 		virtual UUID GetID() const override { return m_uuid; }
 		virtual uint32_t GetRenderID() const override { return m_id; }
 
-		virtual void Resize(uint32_t width, uint32_t height) override;
+		virtual void Resize(uint32_t width, uint32_t height, PixelAlignment alignment = PixelAlignment::NotSpecified) override;
 
 		virtual void Reimport(const TextureFormat& format) override;
 		virtual void Reimport(const Texture2DOutline* mData) override;
@@ -47,6 +48,7 @@ namespace Elysium
 
 		unsigned int m_type;
 		unsigned int m_dataFormat, m_internalFormat;
-		unsigned int m_samples;
+		unsigned int m_samples = 0;
+		PixelAlignment m_pixelAlignment = PixelAlignment::Byte;
 	};
 }

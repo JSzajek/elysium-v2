@@ -88,6 +88,8 @@ namespace Elysium
 		virtual int ReadPixel(uint32_t attachmentIndex, unsigned int x, unsigned int y) = 0;
 		virtual float ReadPixelF(uint32_t attachmentIndex, unsigned int x, unsigned int y) = 0;
 
+		virtual uint8_t* ReadPixelBuffer(uint32_t attachmentIndex, uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
+
 		virtual void ClearAttachmentI(uint32_t attachmentIndex, int value) = 0;
 		virtual void ClearAttachmentF(uint32_t attachmentIndex, const float* value) = 0;
 

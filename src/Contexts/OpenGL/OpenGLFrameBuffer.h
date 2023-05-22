@@ -25,7 +25,9 @@ namespace Elysium
 		virtual void Resize(unsigned int width, unsigned int height) override;
 		virtual int ReadPixel(uint32_t attachmentIndex, unsigned int x, unsigned int y) override;
 		virtual float ReadPixelF(uint32_t attachmentIndex, unsigned int x, unsigned int y) override;
-		
+
+		virtual uint8_t* ReadPixelBuffer(uint32_t attachmentIndex, uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
+
 		virtual void ClearAttachmentI(uint32_t attachmentIndex, int value) override;
 		virtual void ClearAttachmentF(uint32_t attachmentIndex, const float* value) override;
 

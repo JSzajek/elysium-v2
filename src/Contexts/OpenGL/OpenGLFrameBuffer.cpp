@@ -371,6 +371,38 @@ namespace Elysium
 		return pixelData;
 	}
 
+	uint8_t* OpenGLFrameBuffer::ReadPixelBuffer(uint32_t attachmentIndex, uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+	{
+		ELYSIUM_CORE_ASSERT(attachmentIndex < m_colorAttachments.size());
+		glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
+
+		uint32_t dataFormat = 0;
+		uint32_t dataType = 0;
+		uint32_t nChannels = 1;
+		switch (m_colorAttachmentSpecs[attachmentIndex].TextureFormat)
+		{
+		case FrameBufferTextureFormat::RED_INT:
+			dataFormat = GL_RED;
+			dataType = GL_INT;
+			nChannels = 1;
+			break;
+		case FrameBufferTextureFormat::RED_F:
+			dataFormat = GL_RED;
+			dataType = GL_FLOAT;
+			nChannels = 1;
+			break;
+		case FrameBufferTextureFormat::RGBA8:
+			dataFormat = GL_RGBA;
+			dataType = GL_UNSIGNED_BYTE;
+			nChannels = 4;
+			break;
+		}
+
+		uint8_t* pixelData = new uint8_t[width * height * nChannels];
+		glReadPixels(x, y, width, height, dataFormat, dataType, pixelData);
+		return pixelData;
+	}
+
 	void OpenGLFrameBuffer::ClearAttachmentI(uint32_t attachmentIndex, int value)
 	{
 		ELYSIUM_CORE_ASSERT(attachmentIndex < m_colorAttachments.size());

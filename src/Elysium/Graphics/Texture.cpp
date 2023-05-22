@@ -26,6 +26,11 @@ namespace Elysium
 		return NULL;
 	}
 
+	std::shared_ptr<Elysium::Texture2D> Texture2D::Create(uint32_t id, uint32_t width, uint32_t height)
+	{
+		return CreateTexture(id, width, height);
+	}
+
 	std::shared_ptr<Texture2D> Texture2D::Create(uint32_t width, uint32_t height)
 	{
 		return CreateTexture(width, height);

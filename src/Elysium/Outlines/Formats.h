@@ -33,6 +33,23 @@ namespace Elysium
 		Linear = 0, Nearest
 	};
 
+	enum class PixelFormat : unsigned char
+	{
+		R_8 = 0,
+		R8G8,
+		R8G8B8,
+		RGBA_8
+	};
+
+	enum PixelAlignment : unsigned char
+	{
+		NotSpecified = 0,
+		Byte = 1,
+		RowAligned = 2,
+		WordAligned = 4,
+		DoubleWordBoundaries = 8
+	};
+
 	struct TextureFormat
 	{
 	public:
@@ -48,11 +65,16 @@ namespace Elysium
 		bool AlphaTransparency = true;
 		WrapMode Wrap = WrapMode::Repeat;
 		FilterMode Filter = FilterMode::Linear;
-		unsigned int PixelFormat = 4;
+		PixelFormat Format = PixelFormat::RGBA_8;
+		PixelAlignment Alignment = PixelAlignment::Byte;
 	public:
 		TextureFormat() = default;
-		TextureFormat(const std::string& filepath, TextureType type = TextureType::Default, TextureShape shape = TextureShape::Flat, bool srgb = true, bool flipped = true, AlphaSource source = AlphaSource::InputTextureAlpha, bool transparency = true, WrapMode wrap = WrapMode::Repeat, FilterMode filter = FilterMode::Linear)
-			: FilePath(filepath), Type(type), Shape(shape), Source(source), Wrap(wrap), Filter(filter), sRGB(srgb), AlphaTransparency(transparency), Flipped(flipped)
+		TextureFormat(const std::string& filepath, TextureType type = TextureType::Default, 
+					  TextureShape shape = TextureShape::Flat, bool srgb = true, bool flipped = true, 
+					  AlphaSource source = AlphaSource::InputTextureAlpha, bool transparency = true, 
+					  WrapMode wrap = WrapMode::Repeat, FilterMode filter = FilterMode::Linear)
+			: FilePath(filepath), Type(type), Shape(shape), Source(source), Wrap(wrap), Filter(filter), 
+			  sRGB(srgb), AlphaTransparency(transparency), Flipped(flipped)
 		{
 		}
 	};

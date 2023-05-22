@@ -19,7 +19,7 @@ namespace Elysium
 		friend class Application;
 	public:
 		static void DrawTexture(const Shared<FrameBuffer>& output, TextureDrawType type, uint32_t textureAttachment);
-		static void DrawTexture(const Shared<FrameBuffer>& output, TextureDrawType type, const Shared<Texture2D>& texture);
+		static void DrawTexture(const Shared<FrameBuffer>& output, TextureDrawType type, const Shared<Texture2D>& texture, const Shared<Shader>& drawShader = nullptr);
 		static void DrawShader(const Shared<FrameBuffer>& output, const Shared<Shader>& shader);
 	private:
 		static void InitializeDependencies();

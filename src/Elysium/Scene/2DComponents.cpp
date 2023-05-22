@@ -61,4 +61,18 @@ namespace Elysium
 		m_center.y = bounding_avg.y;
 	}
 
+	GizmoRectComponent::GizmoRectComponent()
+		: m_translation(0), m_dimensions(0)
+	{
+	}
+
+	void GizmoRectComponent::SetTranslation(const Math::Vec2& translation)
+	{
+		m_translation = translation;
+	}
+
+	void GizmoRectComponent::SetDimensions(const Math::Vec2& dimensions)
+	{
+		m_dimensions = dimensions;
+	}
 }
