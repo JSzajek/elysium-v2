@@ -11,21 +11,20 @@ namespace Elysium
 {
 	// Forward declaration
 	class Shader;
+	class ShaderAssembler;
 
 	#define MAX_SHADERS_CATEGORIES		4  // Vertex, Fragment/Pixel, Geometry, Compute
 
 	enum class ShaderType : uint8_t
 	{
-		None = 0, Vertex, Fragment, Geometry, Compute
+		None = 0, 
+		Vertex, 
+		Fragment, 
+		Geometry, 
+		Compute
 	};
 
 	typedef std::unordered_map<ShaderType, std::string> ShaderSource;
-
-	struct ShaderProgramSource
-	{
-		std::string m_vertex;
-		std::string m_fragment;
-	};
 
 	class ShaderAssembler
 	{
@@ -35,6 +34,12 @@ namespace Elysium
 
 	class ShaderFactory
 	{
+	public:
+		struct ShaderProgramSource
+		{
+			std::string m_vertex;
+			std::string m_fragment;
+		};
 	public:
 		static void Initialize();
 

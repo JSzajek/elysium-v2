@@ -30,7 +30,7 @@ namespace Elysium
 			m_vbo->SetLayout(layout);
 			s_globals->ScreenQuad->AddVertexBuffer(m_vbo);
 
-			s_globals->WhiteTexture = Texture2D::Create(1, 1);
+			s_globals->WhiteTexture = Texture2D::Create(1u, 1u);
 			uint32_t whiteTextureData = 0xffffffff;
 			s_globals->WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 

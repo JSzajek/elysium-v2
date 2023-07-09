@@ -56,12 +56,195 @@ namespace Elysium
 			else
 				return PixelAlignment::Byte;
 		}
+
+		bool ConvertBitAndFormatToType(PixelFormat pixelformat, PixelBitDepth bitDepth, 
+									   uint32_t& dataformat, uint32_t& internalFormat, uint32_t& type)
+		{
+			switch (pixelformat)
+			{
+			case PixelFormat::R:
+				dataformat = GL_RED;
+				break;
+			case PixelFormat::RG:
+				dataformat = GL_RG;
+				break;
+			case PixelFormat::RGB:
+				dataformat = GL_RGB;
+				break;
+			case PixelFormat::RGBA:
+				dataformat = GL_RGBA;
+				break;
+			}
+
+			switch (bitDepth)
+			{
+				case PixelBitDepth::Bit8U:
+				{
+					type = GL_UNSIGNED_BYTE;
+					switch (pixelformat)
+					{
+					case PixelFormat::R:
+						internalFormat = GL_R8;
+						break;
+					case PixelFormat::RG:
+						internalFormat = GL_RG8;
+						break;
+					case PixelFormat::RGB:
+						internalFormat = GL_RGB8;
+						break;
+					case PixelFormat::RGBA:
+						internalFormat = GL_RGBA8;
+						break;
+					}
+					return true;
+				}
+				case PixelBitDepth::Bit8S:
+				{
+					type = GL_BYTE;
+					switch (pixelformat)
+					{
+					case PixelFormat::R:
+						internalFormat = GL_R8_SNORM;
+						break;
+					case PixelFormat::RG:
+						internalFormat = GL_RG8_SNORM;
+						break;
+					case PixelFormat::RGB:
+						internalFormat = GL_RGB8_SNORM;
+						break;
+					case PixelFormat::RGBA:
+						internalFormat = GL_RGBA8_SNORM;
+						break;
+					}
+					return true;
+				}
+				case PixelBitDepth::Bit16U:
+				{
+					type = GL_UNSIGNED_SHORT;
+					switch (pixelformat)
+					{
+					case PixelFormat::R:
+						internalFormat = GL_R16;
+						break;
+					case PixelFormat::RG:
+						internalFormat = GL_RG16;
+						break;
+					case PixelFormat::RGB:
+						internalFormat = GL_RGB16;
+						break;
+					case PixelFormat::RGBA:
+						internalFormat = GL_RGBA16;
+						break;
+					}
+					return true;
+				}
+				case PixelBitDepth::Bit16S:
+				{
+					type = GL_SHORT;
+					switch (pixelformat)
+					{
+					case PixelFormat::R:
+						internalFormat = GL_R16_SNORM;
+						break;
+					case PixelFormat::RG:
+						internalFormat = GL_RG16_SNORM;
+						break;
+					case PixelFormat::RGB:
+						internalFormat = GL_RGB16_SNORM;
+						break;
+					case PixelFormat::RGBA:
+						internalFormat = GL_RGBA16_SNORM;
+						break;
+					}
+					return true;
+				}
+				case PixelBitDepth::Bit16F:
+				{
+					type = GL_HALF_FLOAT;
+					switch (pixelformat)
+					{
+					case PixelFormat::R:
+						internalFormat = GL_R16F;
+						break;
+					case PixelFormat::RG:
+						internalFormat = GL_RG16F;
+						break;
+					case PixelFormat::RGB:
+						internalFormat = GL_RGB16F;
+						break;
+					case PixelFormat::RGBA:
+						internalFormat = GL_RGBA16F;
+						break;
+					}
+					return true;
+				}
+				case PixelBitDepth::Bit32U:
+				{
+					type = GL_UNSIGNED_INT;
+					switch (pixelformat)
+					{
+					case PixelFormat::R:
+						internalFormat = GL_R32UI;
+						break;
+					case PixelFormat::RG:
+						internalFormat = GL_RG32UI;
+						break;
+					case PixelFormat::RGB:
+						internalFormat = GL_RGB32UI;
+						break;
+					case PixelFormat::RGBA:
+						internalFormat = GL_RGBA32UI;
+						break;
+					}
+					return true;
+				}
+				case PixelBitDepth::Bit32S:
+				{
+					type = GL_INT;
+					switch (pixelformat)
+					{
+					case PixelFormat::R:
+						internalFormat = GL_R32I;
+						break;
+					case PixelFormat::RG:
+						internalFormat = GL_RG32I;
+						break;
+					case PixelFormat::RGB:
+						internalFormat = GL_RGB32I;
+						break;
+					case PixelFormat::RGBA:
+						internalFormat = GL_RGBA32I;
+						break;
+					}
+					return true;
+				}
+				case PixelBitDepth::Bit32F:
+				{
+					type = GL_FLOAT;
+					switch (pixelformat)
+					{
+					case PixelFormat::R:
+						internalFormat = GL_R32F;
+						break;
+					case PixelFormat::RG:
+						internalFormat = GL_RG32F;
+						break;
+					case PixelFormat::RGB:
+						internalFormat = GL_RGB32F;
+						break;
+					case PixelFormat::RGBA:
+						internalFormat = GL_RGBA32F;
+						break;
+					}
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 
-	
-
 	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
-		: m_debugpath(), m_width(width), m_height(height), m_uuid()
+		: m_debugpath(), m_width(width), m_height(height), m_uuid(), m_samples(0)
 	{
 		ELYSIUM_PROFILE_FUNCTION();
 
@@ -69,13 +252,31 @@ namespace Elysium
 		glBindTexture(GL_TEXTURE_2D, m_id);
 
 		auto nrComponents = 4; // Move to parameter?
+
+		// Assumed unsigned bytes
+		m_type = GL_UNSIGNED_BYTE;
+		m_pixelBitDepth = PixelBitDepth::Bit8U;
+		switch (nrComponents)
+		{
+		case 1:
+			m_pixelFormat = PixelFormat::R;
+			break;
+		case 2:
+			m_pixelFormat = PixelFormat::RG;
+			break;
+		case 3:
+			m_pixelFormat = PixelFormat::RGB;
+			break;
+		case 4:
+			m_pixelFormat = PixelFormat::RGBA;
+			break;
+		}
 		GLenum internalFormat = nrComponents == 1 ? GL_RGB8 : nrComponents == 3 ? GL_RGB8 : GL_RGBA8;
 		GLenum format = nrComponents == 1 ? GL_RED : nrComponents == 3 ? GL_RGB : GL_RGBA;
 
 		m_dataFormat = format;
 		m_internalFormat = internalFormat;
 
-		m_type = GL_UNSIGNED_BYTE;
 
 		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, format, m_type, nullptr);
 
@@ -87,14 +288,16 @@ namespace Elysium
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	OpenGLTexture2D::OpenGLTexture2D(uint32_t id, uint32_t width, uint32_t height, unsigned int internalFormat, unsigned int dataFormat, unsigned int type, unsigned int samples)
-		: m_id(id), m_width(width), m_height(height), m_internalFormat(internalFormat), m_dataFormat(dataFormat), m_type(type), m_samples(samples)
+	OpenGLTexture2D::OpenGLTexture2D(uint32_t id, uint32_t width, uint32_t height, 
+									 uint32_t internalFormat, uint32_t dataFormat, uint32_t type, uint32_t samples)
+		: m_id(id), m_width(width), m_height(height), m_internalFormat(internalFormat), 
+		m_dataFormat(dataFormat), m_type(type), m_samples(samples)
 	{
 		ELYSIUM_PROFILE_FUNCTION();
 	}
 
 	OpenGLTexture2D::OpenGLTexture2D(const std::string& filepath)
-		: m_debugpath(filepath), m_width(0), m_height(0), m_uuid()
+		: m_debugpath(filepath), m_width(0), m_height(0), m_uuid(), m_samples(0)
 	{
 		ELYSIUM_PROFILE_FUNCTION();
 
@@ -107,7 +310,7 @@ namespace Elysium
 	}
 
 	OpenGLTexture2D::OpenGLTexture2D(const TextureFormat& format)
-		: m_uuid(format.Uuid)
+		: m_uuid(format.Uuid), m_samples(0)
 	{
 		ELYSIUM_PROFILE_FUNCTION();
 		
@@ -117,7 +320,7 @@ namespace Elysium
 	}
 
 	OpenGLTexture2D::OpenGLTexture2D(const TextureFormat& format, const void* data)
-		: m_uuid(format.Uuid)
+		: m_uuid(format.Uuid), m_samples(0)
 	{
 		m_debugpath = format.FilePath;
 	
@@ -147,12 +350,34 @@ namespace Elysium
 
 			m_width = width;
 			m_height = height;
+
+			TextureFormat newFormat = format;
+
+			// Assumed unsigned bytes
+			newFormat.BitDepth = PixelBitDepth::Bit8U;
+			switch (nrComponents)
+			{
+			case 1:
+				newFormat.Format = PixelFormat::R;
+				break;
+			case 2:
+				newFormat.Format = PixelFormat::RG;
+				break;
+			case 3:
+				newFormat.Format = PixelFormat::RGB;
+				break;
+			case 4:
+				newFormat.Format = PixelFormat::RGBA;
+				break;
+			}
+
+			Initialize(newFormat, data);
+
+			if (data)
+				stbi_image_free(data);
 		}
 
 		Initialize(format, data);
-
-		if (data)
-			stbi_image_free(data);
 	}
 
 	void OpenGLTexture2D::Initialize(const TextureFormat& format, const void* data)
@@ -167,41 +392,19 @@ namespace Elysium
 		else
 			m_pixelAlignment = TexUtils::TextureWidthToPixelAlignment(m_width);
 
+		m_pixelFormat = format.Format;
+		m_pixelBitDepth = format.BitDepth;
+
+		if (!TexUtils::ConvertBitAndFormatToType(format.Format, format.BitDepth, m_dataFormat, m_internalFormat, m_type))
+		{
+			ELYSIUM_CORE_ERROR("Unsupported Texture Format - format {0} : bitdepth {1}.", (uint32_t)format.Format, (uint32_t)format.BitDepth);
+			return;
+		}
+
 		glPixelStorei(GL_UNPACK_ALIGNMENT, m_pixelAlignment);
 
 		glGenTextures(1, &m_id);
 		glBindTexture(GL_TEXTURE_2D, m_id);
-
-		// NOTE:: Assumed only 8-bit formats
-		m_type = GL_UNSIGNED_BYTE;
-
-		switch (format.Format)
-		{
-			case PixelFormat::R_8:
-			{
-				m_internalFormat = GL_R8;
-				m_dataFormat = GL_RED;
-				break;
-			}
-			case PixelFormat::R8G8:
-			{
-				m_internalFormat = GL_RG8;
-				m_dataFormat = GL_RG;
-				break;
-			}
-			case PixelFormat::R8G8B8:
-			{
-				m_internalFormat = GL_RGB8;
-				m_dataFormat = GL_RGB;
-				break;
-			}
-			case PixelFormat::RGBA_8:
-			{
-				m_internalFormat = GL_RGBA8;
-				m_dataFormat = GL_RGBA;
-				break;
-			}
-		}
 
 		glTexImage2D(GL_TEXTURE_2D, 0, m_internalFormat, m_width, m_height, 0, m_dataFormat, m_type, data);
 
@@ -267,14 +470,14 @@ namespace Elysium
 		}
 	}
 
-	void OpenGLTexture2D::Reimport(const TextureFormat& format)
+	void OpenGLTexture2D::Import(const TextureFormat& format)
 	{
 		//TODO::Determine if it is possible to update texture without deletion and re-initialization
 		glDeleteTextures(1, &m_id);
 		Initialize(format);
 	}
 
-	void OpenGLTexture2D::Reimport(const Texture2DOutline* mData)
+	void OpenGLTexture2D::Import(const Texture2DOutline* mData)
 	{
 		//TODO::Determine if it is possible to update texture without deletion and re-initialization
 		glDeleteTextures(1, &m_id);
@@ -289,7 +492,22 @@ namespace Elysium
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, m_pixelAlignment);
 
-		const uint32_t bpp = m_dataFormat == GL_RED ? 1 : m_dataFormat == GL_RGB ? 3 : 4;
+		uint8_t bpp = 0;
+		switch (m_pixelFormat)
+		{
+		case PixelFormat::R:
+			bpp = 1;
+			break;
+		case PixelFormat::RG:
+			bpp = 2;
+			break;
+		case PixelFormat::RGB:
+			bpp = 3;
+			break;
+		case PixelFormat::RGBA:
+			bpp = 4;
+			break;
+		}
 		ELYSIUM_CORE_ASSERT(size == m_width * m_height * bpp, "Data Does Not Cover Entire Texture.");
 
 		glTextureSubImage2D(m_id, 0, 0, 0, m_width, m_height, m_dataFormat, m_type, data);

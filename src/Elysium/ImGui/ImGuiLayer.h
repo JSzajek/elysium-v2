@@ -7,8 +7,6 @@ namespace Elysium
 {
 	class ImGuiLayer : public Layer
 	{
-	private:
-		bool m_blockEvents;
 	public:
 		ImGuiLayer();
 		~ImGuiLayer();
@@ -21,5 +19,17 @@ namespace Elysium
 
 		void Begin();
 		void End();
+	private:
+		struct ImGuiLayerFontData
+		{
+		public:
+			std::array<unsigned short, 3> m_iconRanges_fa;
+			std::array<unsigned short, 3> m_iconRanges_faBrands;
+			std::array<unsigned short, 3> m_iconRanges_fontaudio;
+			std::array<unsigned short, 3> m_iconRanges_kenny;
+		};
+	private:
+		bool m_blockEvents;
+		ImGuiLayerFontData m_fontData;
 	};
 }

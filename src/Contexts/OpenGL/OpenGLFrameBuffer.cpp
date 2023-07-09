@@ -167,36 +167,25 @@ namespace Elysium
 			//glDeleteTextures(1, &m_depthAttachment);
 	}
 
+	void OpenGLFrameBuffer::Bind() const
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
+
+		if (!m_specification.SwapChainTarget)
+			glViewport(0, 0, m_specification.Width, m_specification.Height); //TODO: Check this? Currently necessary for resizing
+	}
+
+	void OpenGLFrameBuffer::Unbind() const
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
 	void OpenGLFrameBuffer::Invalidate()
 	{
 		if (m_id)
 		{
 			glDeleteFramebuffers(1, &m_id);
 
-			//if (m_colorAttachments.size() > 0)
-			//	m_colorAttachments.clear();
-			//
-			////for (uint32_t i = 0; i < m_colorAttachments.size(); ++i)
-			////{
-			////	if (!m_colorAttachmentSpecs[i].OverrideTexture)
-			////	{
-			////		glDeleteTextures(1, &m_colorAttachments[i]);
-			////	}
-			////}
-			//
-			//if (m_depthAttachment)
-			//	m_depthAttachment = nullptr;
-			//	//glDeleteTextures(1, &m_depthAttachment);
-			//if (m_colorAttachments.size() > 0)
-			//{
-			//	for (uint32_t i = 0; i < m_colorAttachments.size(); ++i)
-			//	{
-			//		if (!m_colorAttachmentSpecs[i].TextureOverride)
-			//			m_colorAttachments[i]->Resize(m_specification.Width, m_specification.Height);
-			//	}
-			//}
-			//if (m_depthAttachment)
-			//	m_depthAttachment->Resize(m_specification.Width, m_specification.Height);
 			m_colorAttachments.clear();
 			m_depthAttachment = nullptr;
 		}
@@ -206,7 +195,7 @@ namespace Elysium
 
 		bool multisampled = m_specification.Samples > 1;
 
-		if (m_colorAttachmentSpecs.size())
+		if (!m_colorAttachmentSpecs.empty())
 		{
 			m_colorAttachments.resize(m_colorAttachmentSpecs.size(), NULL);
 			
@@ -217,19 +206,19 @@ namespace Elysium
 					uint32_t id;
 					FBUtils::CreateTextures(multisampled, &id, 1);
 					m_colorAttachments[i] = Texture2D::Create(id, m_specification.Width, m_specification.Height, 
-															  FBUtils::TextureFormatToGLInternalFormat(m_colorAttachmentSpecs[i].TextureFormat),
-															  FBUtils::TextureFormatToGLFormat(m_colorAttachmentSpecs[i].TextureFormat),
-															  m_colorAttachmentSpecs[i].TextureFormat == FrameBufferTextureFormat::RED_F ? GL_FLOAT : GL_UNSIGNED_BYTE,
-															  m_specification.Samples);
+															  (uint32_t)FBUtils::TextureFormatToGLInternalFormat(m_colorAttachmentSpecs[i].TextureFormat),
+															  (uint32_t)FBUtils::TextureFormatToGLFormat(m_colorAttachmentSpecs[i].TextureFormat),
+															  (uint32_t)(m_colorAttachmentSpecs[i].TextureFormat == FrameBufferTextureFormat::RED_F ? GL_FLOAT : GL_UNSIGNED_BYTE),
+															  (uint32_t)m_specification.Samples);
 
 					FBUtils::BindTexture(multisampled, m_colorAttachments[i]->GetRenderID());
-					FBUtils::AttachColorTexture(m_colorAttachments[i]->GetRenderID(), /*m_colorAttachments[i],*/
-												m_specification.Samples,
-												FBUtils::TextureFormatToGLInternalFormat(m_colorAttachmentSpecs[i].TextureFormat),
-												FBUtils::TextureFormatToGLFormat(m_colorAttachmentSpecs[i].TextureFormat),
+					FBUtils::AttachColorTexture(m_colorAttachments[i]->GetRenderID(),
+												(uint32_t)m_specification.Samples,
+												(uint32_t)FBUtils::TextureFormatToGLInternalFormat(m_colorAttachmentSpecs[i].TextureFormat),
+												(uint32_t)FBUtils::TextureFormatToGLFormat(m_colorAttachmentSpecs[i].TextureFormat),
 												m_specification.Width,
 												m_specification.Height, i,
-												m_colorAttachmentSpecs[i].TextureFormat == FrameBufferTextureFormat::RED_F ? GL_FLOAT : GL_UNSIGNED_BYTE);
+												(uint32_t)(m_colorAttachmentSpecs[i].TextureFormat == FrameBufferTextureFormat::RED_F ? GL_FLOAT : GL_UNSIGNED_BYTE));
 				}
 				else
 				{
@@ -417,19 +406,6 @@ namespace Elysium
 		glClearTexImage(m_colorAttachments[attachmentIndex]->GetRenderID(), 0, 
 			FBUtils::TextureFormatToGLFormat(m_colorAttachmentSpecs[attachmentIndex].TextureFormat), 
 			m_colorAttachmentSpecs[attachmentIndex].TextureFormat == FrameBufferTextureFormat::RED_F ? GL_FLOAT : GL_UNSIGNED_BYTE, value);
-	}
-
-	void OpenGLFrameBuffer::Bind()
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
-
-		if (!m_specification.SwapChainTarget)
-			glViewport(0, 0, m_specification.Width, m_specification.Height); //TODO: Check this? Currently necessary for resizing
-	}
-	
-	void OpenGLFrameBuffer::Unbind()
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void OpenGLFrameBuffer::DrawTo(const std::shared_ptr<FrameBuffer>& output, uint32_t index, bool linearInterp)

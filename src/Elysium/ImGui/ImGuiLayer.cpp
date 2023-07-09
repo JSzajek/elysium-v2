@@ -6,12 +6,11 @@
 #include "Elysium/Core/KeyCodes.h"
 #include "Elysium/Pipeline/Application.h"
 #include "Elysium/Utils/FileUtils.h"
+#include "Elysium/Font/ElysiumFonts.h"
 
 #include <imgui.h>
 #include <ImGuizmo.h>
 #include <imnodes.h>
-
-#include <IconsFontAwesome5.h>
 
 // TODO:: Move usage into static render call - Currently Temporary
 #include <GL/glew.h>
@@ -45,22 +44,24 @@ namespace Elysium
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 
-		//// Font From File
+		// Font From File
 		float fontSize = 18.0f;
 		io.Fonts->AddFontFromFileTTF(FileUtils::GetAssetPath_Str("Content/Engine/fonts/opensans/OpenSans-Bold.ttf").c_str(), fontSize);
 		io.FontDefault = io.Fonts->AddFontFromFileTTF(FileUtils::GetAssetPath_Str("Content/Engine/fonts/opensans/OpenSans-Regular.ttf").c_str(), fontSize);
-		//io.Fonts->AddFontFromFileTTF("../Elysium/.default_assets/fonts/opensans/OpenSans-Bold.ttf", fontSize);
-		//io.FontDefault = io.Fonts->AddFontFromFileTTF("../Elysium/.default_assets/fonts/opensans/OpenSans-Regular.ttf", fontSize);
 
 		ImFontConfig config;
 		config.MergeMode = true;
 		config.GlyphMinAdvanceX = 13.0f; // Use if you want to make the icon monospaced
-		static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
-		//io.Fonts->AddFontFromFileTTF("assets/fonts/IconFontCppHeaders/fa-regular-400.ttf", 13.0f, &config, icon_ranges);
-		io.Fonts->AddFontFromFileTTF(FileUtils::GetAssetPath_Str("Content/Engine/fonts/IconFontCppHeaders/fa-solid-900.ttf").c_str(), 13.0f, &config, icon_ranges);
-		io.Fonts->AddFontFromFileTTF(FileUtils::GetAssetPath_Str("Content/Engine/fonts/IconFontCppHeaders/fa-brands-400.ttf").c_str(), 13.0f, &config, icon_ranges);
-		//io.Fonts->AddFontFromFileTTF("../Elysium/.default_assets/fonts/IconFontCppHeaders/fa-solid-900.ttf", 13.0f, &config, icon_ranges);
-		//io.Fonts->AddFontFromFileTTF("../Elysium/.default_assets/fonts/IconFontCppHeaders/fa-brands-400.ttf", 13.0f, &config, icon_ranges);
+
+		m_fontData.m_iconRanges_fa = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+		m_fontData.m_iconRanges_faBrands = { ICON_MIN_FAB, ICON_MAX_FAB, 0 };
+		m_fontData.m_iconRanges_fontaudio = { ICON_MIN_FAD, ICON_MAX_FAD, 0 };
+		m_fontData.m_iconRanges_kenny = { ICON_MIN_KI, ICON_MAX_KI, 0 };
+
+		io.Fonts->AddFontFromFileTTF(FileUtils::GetAssetPath_Str("Content/Engine/fonts/IconFontCppHeaders/fa-solid-900.ttf").c_str(), 13.0f, &config, &m_fontData.m_iconRanges_fa[0]);
+		io.Fonts->AddFontFromFileTTF(FileUtils::GetAssetPath_Str("Content/Engine/fonts/IconFontCppHeaders/fa-brands-400.ttf").c_str(), 13.0f, &config, &m_fontData.m_iconRanges_faBrands[0]);
+		io.Fonts->AddFontFromFileTTF(FileUtils::GetAssetPath_Str("Content/Engine/fonts/IconFontCppHeaders/fontaudio.ttf").c_str(), 13.0f, &config, &m_fontData.m_iconRanges_fontaudio[0]);
+		io.Fonts->AddFontFromFileTTF(FileUtils::GetAssetPath_Str("Content/Engine/fonts/IconFontCppHeaders/kenney-icon-font.ttf").c_str(), 13.0f, &config, &m_fontData.m_iconRanges_kenny[0]);
 
 		ImGuiStyle& style = ImGui::GetStyle();
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)

@@ -15,14 +15,14 @@ namespace Elysium
 	};
 	static RenderCommandsData s_data;
 
-	void RenderCommands::DrawTexture(const Shared<FrameBuffer>& output, TextureDrawType type, uint32_t textureAttachment)
+	void RenderCommands::DrawTexture(const Shared<FrameBuffer>& output, TextureDrawType type, uint32_t textureId)
 	{
 		GraphicsCalls::SetDepthTesting(false);
 		output->Bind();
 
 		s_data.m_vao->Bind();
 		s_data.m_screenShader->Bind();
-		GraphicsCalls::BindTexture(textureAttachment, 0);
+		GraphicsCalls::BindTexture(textureId, 0);
 		GraphicsCalls::DrawTriangles(6);
 
 		output->Unbind();
@@ -49,7 +49,7 @@ namespace Elysium
 		GraphicsCalls::SetDepthTesting(true);
 	}
 
-	void RenderCommands::DrawShader(const Shared<FrameBuffer>& output, const Shared<Shader>& shader)
+	void RenderCommands::DrawScreenShader(const Shared<FrameBuffer>& output, const Shared<Shader>& shader)
 	{
 		GraphicsCalls::SetDepthTesting(false);
 		output->Bind();

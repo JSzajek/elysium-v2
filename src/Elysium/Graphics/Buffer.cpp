@@ -1,6 +1,7 @@
 #include "elysium_pch.h"
 
 #include "Elysium/Core/Asserts.h"
+#include "Elysium/Core/Memory.h"
 
 #include "Elysium/Graphics/Buffer.h"
 #include "Elysium/Graphics/GraphicsAPI.h"
@@ -17,7 +18,7 @@ namespace Elysium
 			ELYSIUM_CORE_ASSERT(false, "Renderer API currently not set.");
 			return NULL;
 		case API::OpenGL:
-			return std::make_shared<OpenGLVertexBuffer>(size);
+			return CreateShared<OpenGLVertexBuffer>(size);
 		}
 
 		ELYSIUM_CORE_ASSERT(false, "Unknown Renderer API");
@@ -32,7 +33,7 @@ namespace Elysium
 			ELYSIUM_CORE_ASSERT(false, "Renderer API currently not set.");
 			return NULL;
 		case API::OpenGL:
-			return std::make_shared<OpenGLVertexBuffer>(vertices, size, dynamic);
+			return CreateShared<OpenGLVertexBuffer>(vertices, size, dynamic);
 		}
 		
 		ELYSIUM_CORE_ASSERT(false, "Unknown Renderer API");
@@ -47,7 +48,7 @@ namespace Elysium
 			ELYSIUM_CORE_ASSERT(false, "Renderer API currently not set.");
 			return NULL;
 		case API::OpenGL:
-			return std::make_shared<OpenGLIndexBuffer>(count);
+			return CreateShared<OpenGLIndexBuffer>(count);
 		}
 
 		ELYSIUM_CORE_ASSERT(false, "Unknown Renderer API");
@@ -62,7 +63,7 @@ namespace Elysium
 			ELYSIUM_CORE_ASSERT(false, "Renderer API currently not set.");
 			return NULL;
 		case API::OpenGL:
-			return std::make_shared<OpenGLIndexBuffer>(indices, count);
+			return CreateShared<OpenGLIndexBuffer>(indices, count);
 		}
 
 		ELYSIUM_CORE_ASSERT(false, "Unknown Renderer API");

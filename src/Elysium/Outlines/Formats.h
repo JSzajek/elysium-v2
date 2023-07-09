@@ -35,10 +35,22 @@ namespace Elysium
 
 	enum class PixelFormat : unsigned char
 	{
-		R_8 = 0,
-		R8G8,
-		R8G8B8,
-		RGBA_8
+		R = 0,
+		RG,
+		RGB,
+		RGBA
+	};
+
+	enum class PixelBitDepth : unsigned char
+	{
+		Bit8U,
+		Bit8S,
+		Bit16U,
+		Bit16S,
+		Bit16F,
+		Bit32U,
+		Bit32S,
+		Bit32F
 	};
 
 	enum PixelAlignment : unsigned char
@@ -65,7 +77,8 @@ namespace Elysium
 		bool AlphaTransparency = true;
 		WrapMode Wrap = WrapMode::Repeat;
 		FilterMode Filter = FilterMode::Linear;
-		PixelFormat Format = PixelFormat::RGBA_8;
+		PixelFormat Format = PixelFormat::RGBA;
+		PixelBitDepth BitDepth = PixelBitDepth::Bit8U;
 		PixelAlignment Alignment = PixelAlignment::Byte;
 	public:
 		TextureFormat() = default;

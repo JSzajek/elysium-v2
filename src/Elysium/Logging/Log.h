@@ -1,11 +1,10 @@
 #pragma once
 
 #include "Elysium/core/Base.h"
+#include "Elysium/Core/Memory.h"
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-
-#include <memory.h>
 
 namespace Elysium
 {

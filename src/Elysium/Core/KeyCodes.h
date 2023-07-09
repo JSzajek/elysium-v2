@@ -6,6 +6,9 @@ namespace Elysium
 
 	namespace Key
 	{
+		/// <summary>
+		/// Enum class representing key codes.
+		/// </summary>
 		enum : KeyCode
 		{
 			// From glfw3.h

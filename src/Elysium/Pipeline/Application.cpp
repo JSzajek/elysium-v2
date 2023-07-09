@@ -60,7 +60,7 @@ namespace Elysium
 
 		// TODO:: Make this configurable
 		GraphicsAPI::SetAPI(API::OpenGL);
-		GraphicsCalls::SetupCalle();
+		GraphicsCalls::SetupCallee();
 
 		ShaderFactory::Initialize();
 		RenderCommands::InitializeDependencies();

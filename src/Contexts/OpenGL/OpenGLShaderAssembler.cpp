@@ -151,6 +151,17 @@ namespace Elysium
 	{
 		if (GraphicsCalls::IsShaderBinarySupported()) // switch to pre-compiling
 		{
+			std::unordered_map<unsigned int, std::vector<uint32_t>> m_openglSPIRV;
+			if (CompileOrGetBinaries(id, source, "", m_openglSPIRV))
+			{
+				std::string errorString;
+				if (!CreateFromBinaries(id, m_openglSPIRV, errorString))
+				{
+					ELYSIUM_CORE_ERROR("Shader Compilation Failure:\n\t{0}", errorString);
+					return false;
+				}
+				return true;
+			}
 			return false;
 		}
 		else
@@ -228,8 +239,44 @@ namespace Elysium
 		return true;
 	}
 
-	bool OpenGLShaderAssembler::CompileOrGetBinaries(uint32_t& id, const ShaderSource& sources, const std::string& currentDir, std::unordered_map<unsigned int, std::vector<uint32_t>>& sprvMap) const
+	bool OpenGLShaderAssembler::CompileOrGetBinaries(uint32_t& id, const ShaderSource& sources, const std::string& currentDir, 
+													 std::unordered_map<unsigned int, std::vector<uint32_t>>& sprivMap) const
 	{
+		ELYSIUM_CORE_ASSERT(sources.size() <= MAX_SHADERS_CATEGORIES, "Found Too Many Shaders In Source.");
+
+		GLuint program = glCreateProgram();
+
+		shaderc::Compiler compiler;
+		shaderc::CompileOptions options;
+		options.SetTargetEnvironment(shaderc_target_env_opengl, 420);
+		const bool optimize = true;
+		if (optimize)
+			options.SetOptimizationLevel(shaderc_optimization_level_performance);
+
+		for (auto&& [stage, source] : sources)
+		{
+			shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source.c_str(), source.size(), 
+																			 Utils::GLShaderStageToShaderC(static_cast<uint8_t>(stage)), "");
+			if (module.GetCompilationStatus() != shaderc_compilation_status_success)
+			{
+				ELYSIUM_CORE_ERROR("Shader Couldn't Compile: {1}", module.GetErrorMessage()); //TODO:: Safely exit and mark as incomplete instead
+				return false;
+			}
+
+			sprivMap[static_cast<uint8_t>(stage)] = std::vector<uint32_t>(module.cbegin(), module.cend());
+
+			// TODO:: Implement caching of shader binaries
+		#if 0
+			std::ofstream out(cachePath, std::ios::out | std::ios::binary);
+			if (out.is_open())
+			{
+				auto& data = sprivMap[stage];
+				out.write((char*)data.data(), static_cast<std::streamsize>(data.size()) * sizeof(uint32_t));
+				out.flush();
+				out.close();
+			}
+		#endif
+		}
 
 		//ELYSIUM_CORE_ERROR("Shader linking failed ({0}):\n{1}", output->m_filepath, infoLog.data());
 		return false;

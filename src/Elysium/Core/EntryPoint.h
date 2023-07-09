@@ -5,8 +5,18 @@
 
 #ifdef ELYSIUM_PLATFORM_WINDOWS
 
+#if ELYSIUM_RELEASE
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+#endif
+
 extern Elysium::Application* Elysium::CreateApplication();
 
+/// <summary>
+/// The main application entry point.
+/// </summary>
+/// <param name="argc">The number of argument parameters</param>
+/// <param name="argv">The passed arguments</param>
+/// <returns>The application state</returns>
 int main(int argc, char** argv)
 {
 	Elysium::Log::Init();
