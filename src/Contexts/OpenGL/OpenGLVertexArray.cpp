@@ -101,7 +101,7 @@ namespace Elysium
 		glBindVertexArray(0);
 	}
 
-	void VertexArray::SetAttribLayout(const BufferLayout& layout)
+	void VertexArray::SetAttributeLayout(const BufferLayout& layout)
 	{
 		uint16_t index = 0;
 		for (const auto& element : layout)
@@ -118,7 +118,7 @@ namespace Elysium
 		}
 	}
 
-	void VertexArray::ClearAttribLayout(uint8_t count, uint8_t offset)
+	void VertexArray::ClearAttributeLayout(uint8_t count, uint8_t offset)
 	{
 		for (uint8_t i = offset; i < count; ++i)
 			glDisableVertexAttribArray(i);

@@ -6,6 +6,9 @@ namespace Elysium
 
 	namespace Mouse
 	{
+		/// <summary>
+		/// Enum representing mouse codes.
+		/// </summary>
 		enum : MouseCode
 		{
 			// From glfw3.h

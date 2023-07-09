@@ -1,6 +1,7 @@
 #include "elysium_pch.h"
 
 #include "Elysium/Core/Asserts.h"
+#include "Elysium/Core/Memory.h"
 
 #include "Elysium/Graphics/TransformFeedback.h"
 #include "Elysium/Graphics/GraphicsAPI.h"
@@ -9,7 +10,7 @@
 
 namespace Elysium
 {
-	std::shared_ptr<TransformFeedback> TransformFeedback::Create()
+	Shared<TransformFeedback> TransformFeedback::Create()
 	{
 		switch (GraphicsAPI::GetAPI())
 		{
@@ -17,7 +18,7 @@ namespace Elysium
 			ELYSIUM_CORE_ASSERT(false, "Renderer API currently not set.");
 			return NULL;
 		case API::OpenGL:
-			return std::make_shared<OpenGLTransformFeedback>();
+			return CreateShared<OpenGLTransformFeedback>();
 		}
 		ELYSIUM_CORE_ASSERT(false, "Unknown Renderer API");
 		return NULL;

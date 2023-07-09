@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Elysium/Core/Asserts.h"
+#include "Elysium/Graphics/RenderObject.h"
 
 #include <cstdint>
 #include <string>
@@ -9,6 +10,9 @@
 
 namespace Elysium
 {
+	/// <summary>
+	/// Enum representing data type for shaders.
+	/// </summary>
 	enum class ShaderDataType : unsigned char
 	{
 		None = 0, 
@@ -18,6 +22,11 @@ namespace Elysium
 		Bool
 	};
 
+	/// <summary>
+	/// Retrieves the data size of the shader data type.
+	/// </summary>
+	/// <param name="type">The shader data type</param>
+	/// <returns>Return the data size</returns>
 	static unsigned int ShaderDataTypeSize(ShaderDataType type)
 	{
 		switch (type)
@@ -42,21 +51,44 @@ namespace Elysium
 		return 0;
 	}
 
+	/// <summary>
+	/// Struct representing a buffer element.
+	/// </summary>
 	struct BufferElement
 	{
 	public:
+		/// <summary>
+		/// Default constructor.
+		/// </summary>
 		BufferElement() = default;
 
+		/// <summary>
+		/// Constructor initializing a BufferElement.
+		/// </summary>
+		/// <param name="type">The shader data type</param>
+		/// <param name="name">The name of the buffer element</param>
+		/// <param name="normalized">Whether the data type is normalized</param>
 		BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
 			: Type(type), Name(name), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized)
 		{
 		}
 
+		/// <summary>
+		/// Constructor initializing a BufferElement.
+		/// </summary>
+		/// <param name="type"></param>
+		/// <param name="offset"></param>
+		/// <param name="name"></param>
+		/// <param name="normalized"></param>
 		BufferElement(ShaderDataType type, uint16_t offset, const std::string& name, bool normalized = false)
 			: Type(type), Name(name), Size(ShaderDataTypeSize(type)), Offset(offset), Normalized(normalized)
 		{
 		}
 
+		/// <summary>
+		/// Retrieves the component count of the buffer element.
+		/// </summary>
+		/// <returns>The component count</returns>
 		unsigned int GetComponentCount() const
 		{
 			switch (Type)
@@ -88,11 +120,21 @@ namespace Elysium
 		bool Normalized = false;
 	};
 
+	/// <summary>
+	/// Class representing the layout of a buffer in terms of element types.
+	/// </summary>
 	class BufferLayout
 	{
 	public:
+		/// <summary>
+		/// Default constructor.
+		/// </summary>
 		BufferLayout() = default;
 
+		/// <summary>
+		/// Constructor initializing an BufferLayout.
+		/// </summary>
+		/// <param name="elements">The buffer layout elements</param>
 		BufferLayout(const std::initializer_list<BufferElement>& elements) 
 			: m_elements(elements), m_stride(0)
 		{
@@ -107,6 +149,9 @@ namespace Elysium
 		std::vector<BufferElement>::const_iterator begin() const { return m_elements.begin(); }
 		std::vector<BufferElement>::const_iterator end() const { return m_elements.end(); }
 	private:
+		/// <summary>
+		/// Calculates the offset and stride of the buffer based on the elements.
+		/// </summary>
 		void CalculateOffsetAndStride()
 		{
 			uint16_t offset = 0;
@@ -123,33 +168,19 @@ namespace Elysium
 		uint16_t m_stride;
 	};
 
-	class RenderBuffer
+	/// <summary>
+	/// Base render buffer abstract class.
+	/// </summary>
+	class RenderBuffer : public BindableRenderObject
 	{
-		/// <summary>
-		/// Binds the buffer.
-		/// </summary>
-		virtual void Bind() const = 0;
-
-		/// <summary>
-		/// Unbinds the buffer.
-		/// </summary>
-		virtual void Unbind() const = 0;
-
-		/// <summary>
-		/// Gets the render id of the buffer.
-		/// </summary>
-		/// <returns>The render id</returns>
-		virtual uint32_t GetRenderID() const = 0;
 	};
 
+	/// <summary>
+	/// Abstract class representing a graphics vertex buffer.
+	/// </summary>
 	class VertexBuffer : public RenderBuffer
 	{
 	public:
-		/// <summary>
-		/// Default destructor.
-		/// </summary>
-		virtual ~VertexBuffer() { }
-
 		/// <summary>
 		/// Sets the layout of the buffer.
 		/// </summary>
@@ -186,15 +217,14 @@ namespace Elysium
 		static std::shared_ptr<VertexBuffer> Create(void* vertices, size_t size, bool dynamic = false);
 	};
 
-	// Only supports 32 bit index buffers
+	/// <summary>
+	/// Abstract class representing a graphics index buffer.
+	/// 
+	/// NOTE:: Currently only supports 32-bit indices
+	/// </summary>
 	class IndexBuffer : public RenderBuffer
 	{
 	public:
-		/// <summary>
-		/// Default destructor.
-		/// </summary>
-		virtual ~IndexBuffer() { }
-		
 		/// <summary>
 		/// Retrieves the number of indices in the index buffer.
 		/// </summary>

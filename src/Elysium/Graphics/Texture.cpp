@@ -10,7 +10,7 @@
 namespace Elysium
 {
 	template<class ...Args>
-	static constexpr std::shared_ptr<Texture2D> CreateTexture(Args&&... args)
+	static Shared<Texture2D> CreateTexture(Args&&... args)
 	{
 		switch (GraphicsAPI::GetAPI())
 		{
@@ -18,42 +18,12 @@ namespace Elysium
 			ELYSIUM_CORE_ASSERT(false, "Renderer API currently not set.");
 			return NULL;
 		case API::OpenGL:
-			return std::make_shared<OpenGLTexture2D>(std::forward<Args>(args)...);
+			return CreateShared<OpenGLTexture2D>(std::forward<Args>(args)...);
 			return NULL;
 		}
 
 		ELYSIUM_CORE_ASSERT(false, "Unknown Renderer API");
 		return NULL;
-	}
-
-	std::shared_ptr<Elysium::Texture2D> Texture2D::Create(uint32_t id, uint32_t width, uint32_t height)
-	{
-		return CreateTexture(id, width, height);
-	}
-
-	std::shared_ptr<Texture2D> Texture2D::Create(uint32_t width, uint32_t height)
-	{
-		return CreateTexture(width, height);
-	}
-
-	std::shared_ptr<Texture2D> Texture2D::Create(uint32_t id, uint32_t width, uint32_t height, unsigned int internalFormat, unsigned int dataFormat, unsigned int type, unsigned int samples)
-	{
-		return CreateTexture(id, width, height, internalFormat, dataFormat, type, samples);
-	}
-
-	std::shared_ptr<Texture2D> Texture2D::Create(const std::string& filepath)
-	{
-		return CreateTexture(filepath);
-	}
-
-	std::shared_ptr<Texture2D> Texture2D::Create(const TextureFormat& format)
-	{
-		return CreateTexture(format);
-	}
-
-	std::shared_ptr<Texture2D> Texture2D::Create(const TextureFormat& format, const void* data)
-	{
-		return CreateTexture(format, data);
 	}
 
 	void Texture2D::WriteToFile(const Texture2DOutline* mData, const std::string& outputFilepath)
@@ -71,5 +41,36 @@ namespace Elysium
 			out << YAML::Key << "WrapMode"			<< YAML::Value << mData->WrapMode;
 			out << YAML::Key << "FilterMode"		<< YAML::Value << mData->FilterMode;
 		});
+	}
+
+	Shared<Elysium::Texture2D> Texture2D::Create(uint32_t id, uint32_t width, uint32_t height)
+	{
+		return CreateTexture(id, width, height);
+	}
+
+	Shared<Texture2D> Texture2D::Create(uint32_t width, uint32_t height)
+	{
+		return CreateTexture(width, height);
+	}
+
+	Shared<Texture2D> Texture2D::Create(uint32_t id, uint32_t width, uint32_t height, 
+										uint32_t internalFormat, uint32_t dataFormat, uint32_t type, uint32_t samples)
+	{
+		return CreateTexture(id, width, height, internalFormat, dataFormat, type, samples);
+	}
+
+	Shared<Texture2D> Texture2D::Create(const std::string& filepath)
+	{
+		return CreateTexture(filepath);
+	}
+
+	Shared<Texture2D> Texture2D::Create(const TextureFormat& format)
+	{
+		return CreateTexture(format);
+	}
+
+	Shared<Texture2D> Texture2D::Create(const TextureFormat& format, const void* data)
+	{
+		return CreateTexture(format, data);
 	}
 }

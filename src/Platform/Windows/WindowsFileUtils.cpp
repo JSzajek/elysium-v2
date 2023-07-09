@@ -62,10 +62,11 @@ namespace Elysium
 	{
 		std::stack<std::filesystem::path> checkDirectories;
 
+#if !ELYSIUM_RELEASE
 		checkDirectories.push(GetCurrentProjectDir());
 		checkDirectories.push(GetCurrentSolutionDir());
+#endif
 		checkDirectories.push("");
-
 		while (!checkDirectories.empty())
 		{
 			const std::filesystem::path potentialFileDir = checkDirectories.top() / path;

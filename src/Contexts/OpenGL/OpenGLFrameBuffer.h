@@ -17,7 +17,11 @@ namespace Elysium
 		}
 		virtual ~OpenGLFrameBuffer() override;
 
+		virtual void Bind() const override;
+		virtual void Unbind() const override;
+
 		inline virtual uint32_t GetRenderID() const override { return m_id; }
+		inline virtual uint32_t& GetRenderIDRef() override { return m_id; };
 
 		void Invalidate();
 		void UpdateSpecification(const FrameBufferSpecification& specification) override;
@@ -30,9 +34,6 @@ namespace Elysium
 
 		virtual void ClearAttachmentI(uint32_t attachmentIndex, int value) override;
 		virtual void ClearAttachmentF(uint32_t attachmentIndex, const float* value) override;
-
-		virtual void Bind() override;
-		virtual void Unbind() override;
 
 		virtual void DrawTo(const std::shared_ptr<FrameBuffer>& output, uint32_t index, bool linearInterp) override;
 

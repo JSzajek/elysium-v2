@@ -36,6 +36,8 @@
 
 #include "Elysium/Renderer/RendererDefines.h"
 
+#include "Elysium/Font/ElysiumFonts.h"
+
 #include "Elysium/Scene/Scene.h"
 #include "Elysium/Scene/Time.h"
 #include "Elysium/Scene/Entity.h"

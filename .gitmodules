@@ -7,3 +7,6 @@
 [submodule "vendor/yaml-cpp"]
 	path = vendor/yaml-cpp
 	url = https://gitlab.com/jszajek/yaml-cpp-fork.git
+[submodule "vendor/glfw"]
+	path = vendor/glfw
+	url = https://gitlab.com/jszajek/glfw-fork.git

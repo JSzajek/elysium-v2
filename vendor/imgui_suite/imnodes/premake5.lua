@@ -4,8 +4,10 @@ project "ImNodes"
 	kind "StaticLib"
 	language "C++"
 
-	targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
+	staticruntime "on"
+
+	targetdir ("%{wks.location}/Binaries/" .. outputdir .. "/%{prj.name}")
+	objdir ("%{wks.location}/Intermediates/" .. outputdir .. "/%{prj.name}")
 
 	files
 	{
@@ -22,18 +24,14 @@ project "ImNodes"
 	filter "system:windows"
 		systemversion "latest"
 		cppdialect "C++17"
-		staticruntime "On"
-
 	filter "system:linux"
 		pic "On"
 		systemversion "latest"
 		cppdialect "C++17"
-		staticruntime "On"
 
 	filter "configurations:Debug"
 		runtime "Debug"
 		symbols "on"
-
 	filter "configurations:Release"
 		runtime "Release"
 		optimize "on"

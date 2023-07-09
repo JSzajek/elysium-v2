@@ -1,9 +1,13 @@
+include "Elysium/elysium_dependencies.lua"
+
 project "ImGui"
 	kind "StaticLib"
 	language "C++"
 
-	targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
+	staticruntime "on"
+
+	targetdir ("%{wks.location}/Binaries/" .. outputdir .. "/%{prj.name}")
+	objdir ("%{wks.location}/Intermediates/" .. outputdir .. "/%{prj.name}")
 
 	files
 	{
@@ -16,32 +20,36 @@ project "ImGui"
 		"imstb_rectpack.h",
 		"imstb_textedit.h",
 		"imstb_truetype.h",
-		"imgui_impl_opengl3.cpp",
 		"imgui_impl_opengl3.h",
-		"imgui_impl_glfw.cpp",
+		"imgui_impl_opengl3.cpp",
 		"imgui_impl_glfw.h",
+		"imgui_impl_glfw.cpp",
 		"imgui_demo.cpp"
 	}
 
 	includedirs
 	{
+		"%{IncludeDir.glfw}"
 	}
+
+	links
+	{
+		"GLFW"
+	}
+
+	LinkGLEW()
 
 	filter "system:windows"
 		systemversion "latest"
 		cppdialect "C++17"
-		staticruntime "On"
-
 	filter "system:linux"
 		pic "On"
 		systemversion "latest"
 		cppdialect "C++17"
-		staticruntime "On"
 
 	filter "configurations:Debug"
 		runtime "Debug"
 		symbols "on"
-
 	filter "configurations:Release"
 		runtime "Release"
 		optimize "on"
