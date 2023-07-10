@@ -19,7 +19,7 @@ function LinkElysium()
 
 	postbuildcommands
 	{
-		"{COPY} " .. '"' .. "%{wks.location}/bin/" .. outputdir .. "/Elysium/*.dll" .. '"' .. " %{cfg.targetdir}",
-		"{COPY} " .. '"' .. "%{wks.location}/bin/" .. outputdir .. "/Elysium/*.pdb" .. '"' .. " %{cfg.targetdir}"
+		"{COPY} " .. '"' .. "%{cfg.targetdir}/../" .. "Elysium/*.dll" .. '"' .. " %{cfg.targetdir}",
+		"{COPY} " .. '"' .. "%{cfg.targetdir}/../" .. "Elysium/*.pdb" .. '"' .. " %{cfg.targetdir}"
 	}
 end
