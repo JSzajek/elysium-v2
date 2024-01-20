@@ -34,6 +34,8 @@ project "Elysium"
 		"%{ImGui_IncludeDir.ImGui}",
 		"%{ImGui_IncludeDir.ImGuizmo}",
 		"%{ImGui_IncludeDir.ImNodes}",
+		"%{ImGui_IncludeDir.ImTextEditor}",
+		
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.IconFontCppHeaders}",
 		"%{IncludeDir.stduuid}",
@@ -53,6 +55,7 @@ project "Elysium"
 		"ImGui",
 		"ImGuizmo",
 		"ImNodes",
+		"ImTextEditor",
 		"yaml-cpp",
 	}
 
