@@ -10,3 +10,6 @@
 [submodule "vendor/glfw"]
 	path = vendor/glfw
 	url = https://gitlab.com/jszajek/glfw-fork.git
+[submodule "vendor/imgui_suite"]
+	path = vendor/imgui_suite
+	url = https://gitlab.com/jszajek/imgui-suite.git
