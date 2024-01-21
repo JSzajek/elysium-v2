@@ -42,7 +42,7 @@ namespace Elysium
 			ELYSIUM_CORE_ASSERT(false, "Core Uniform Buffer Definitions Not Found.");
 	}
 
-	std::shared_ptr<Shader> ShaderFactory::Create(const std::string& filepath)
+	std::shared_ptr<Shader> ShaderFactory::Create(const std::string& filepath, std::string* errorMsg)
 	{
 		const std::string solvedFilepath = FileUtils::GetAssetPath_Str(filepath);
 
@@ -51,7 +51,7 @@ namespace Elysium
 			std::shared_ptr<Shader> result = CreateShader();
 
 			const ShaderSource source = PreProcess(ReadFile(solvedFilepath));
-			if (!s_assembler->Compile(result->GetRenderIDRef(), source))
+			if (!s_assembler->Compile(result->GetRenderIDRef(), source, errorMsg))
 			{
 				result->SetIsCompiled(false);
 				return nullptr;
@@ -63,7 +63,8 @@ namespace Elysium
 		return nullptr;
 	}
 
-	std::shared_ptr<Shader> ShaderFactory::Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
+	std::shared_ptr<Shader> ShaderFactory::Create(const std::string& name, const std::string& vertexSrc, 
+												  const std::string& fragmentSrc, std::string* errorMsg)
 	{
 		const ShaderSource source =
 		{
@@ -74,10 +75,24 @@ namespace Elysium
 		std::shared_ptr<Shader> result = CreateShader();
 
 		uint32_t id = 0;
-		if (!s_assembler->Compile(result->GetRenderIDRef(), source))
+		if (!s_assembler->Compile(result->GetRenderIDRef(), source, errorMsg))
 		{
 			return nullptr;
 		}
+		return result;
+	}
+
+	Elysium::Shared<Elysium::Shader> ShaderFactory::CreateFromCode(const std::string& code, std::string* errorMsg)
+	{
+		std::shared_ptr<Shader> result = CreateShader();
+
+		const ShaderSource source = PreProcess(code);
+		if (!s_assembler->Compile(result->GetRenderIDRef(), source, errorMsg))
+		{
+			result->SetIsCompiled(false);
+			return nullptr;
+		}
+		result->SetIsCompiled(true);
 		return result;
 	}
 

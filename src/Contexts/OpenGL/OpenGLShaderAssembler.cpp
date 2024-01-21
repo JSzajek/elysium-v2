@@ -147,7 +147,7 @@ namespace Elysium
 		}
 	}
 
-	bool OpenGLShaderAssembler::Compile(uint32_t& id, const ShaderSource& source) const
+	bool OpenGLShaderAssembler::Compile(uint32_t& id, const ShaderSource& source, std::string* errorMsg) const
 	{
 		if (GraphicsCalls::IsShaderBinarySupported()) // switch to pre-compiling
 		{
@@ -157,6 +157,9 @@ namespace Elysium
 				std::string errorString;
 				if (!CreateFromBinaries(id, m_openglSPIRV, errorString))
 				{
+					if (errorMsg)
+						*errorMsg = errorString;
+
 					ELYSIUM_CORE_ERROR("Shader Compilation Failure:\n\t{0}", errorString);
 					return false;
 				}
@@ -170,6 +173,9 @@ namespace Elysium
 			std::string errorString;
 			if (!OnDemandCompile(id, source, errorString))
 			{
+				if (errorMsg)
+					*errorMsg = errorString;
+
 				ELYSIUM_CORE_ERROR("Shader Compilation Failure:\n\t{0}", errorString);
 				return false;
 			}

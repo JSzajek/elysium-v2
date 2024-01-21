@@ -29,7 +29,7 @@ namespace Elysium
 	class ShaderAssembler
 	{
 	public:
-		virtual bool Compile(uint32_t& id, const ShaderSource& source) const = 0;
+		virtual bool Compile(uint32_t& id, const ShaderSource& source, std::string* errorMsg = nullptr) const = 0;
 	};
 
 	class ShaderFactory
@@ -43,8 +43,10 @@ namespace Elysium
 	public:
 		static void Initialize();
 
-		static Shared<Shader> Create(const std::string& filepath);
-		static Shared<Shader> Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
+		static Shared<Shader> Create(const std::string& filepath, std::string* errorMsg = nullptr);
+		static Shared<Shader> Create(const std::string& name, const std::string& vertexSrc, 
+									 const std::string& fragmentSrc, std::string* errorMsg = nullptr);
+		static Shared<Shader> CreateFromCode(const std::string& code, std::string* errorMsg = nullptr);
 	private:
 		static Shared<Shader> CreateShader();
 		static std::string ReadFile(const std::string& filepath);
