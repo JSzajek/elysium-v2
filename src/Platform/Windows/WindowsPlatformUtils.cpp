@@ -67,4 +67,38 @@ namespace Elysium
 		}
 		return "";
 	}
+
+	FileDialogs::DialogResult FileDialogs::YesNoMessage(const char* title, const char* message)
+	{
+		HWND window = glfwGetWin32Window((GLFWwindow*)Application::Get().GetWindow().GetNativeWindow());
+		int result = MessageBoxA(window, message, title, MB_YESNO);
+
+		switch (result)
+		{
+		case IDYES:
+			return FileDialogs::DialogResult::Yes;
+		case IDNO:
+			return FileDialogs::DialogResult::No;
+		default:
+			return FileDialogs::DialogResult::Error;
+		}
+	}
+
+	FileDialogs::DialogResult FileDialogs::YesNoCancelMessage(const char* title, const char* message)
+	{
+		HWND window = glfwGetWin32Window((GLFWwindow*)Application::Get().GetWindow().GetNativeWindow());
+		int result = MessageBoxA(window, message, title, MB_YESNOCANCEL);
+
+		switch (result)
+		{
+		case IDYES:
+			return FileDialogs::DialogResult::Yes;
+		case IDNO:
+			return FileDialogs::DialogResult::No;
+		case IDCANCEL:
+			return FileDialogs::DialogResult::Cancel;
+		default:
+			return FileDialogs::DialogResult::Error;
+		}
+	}
 }
