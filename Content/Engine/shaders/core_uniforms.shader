@@ -1,4 +1,5 @@
 
+#define Math_PI 3.1415926535897932384626433
 #define Math_TAU 6.2831853071795864769252867666
 
 layout(std140, binding = 0) uniform Camera
