@@ -40,6 +40,14 @@ namespace Elysium
 								const Shared<Shader>& drawShader = nullptr);
 
 		/// <summary>
+		/// Helper render command to draw textures to a buffer.
+		/// </summary>
+		/// <param name="output">The output buffer</param>
+		/// <param name="drawShader">The shader to use</param>
+		/// <param name="textures">The textures to draw</param>
+		static void DrawTextures(const Shared<FrameBuffer>& output, const Shared<Shader>& drawShader, const std::vector<Shared<Texture2D>>& textures);
+
+		/// <summary>
 		/// Helper render command to draw a screen shader to a buffer.
 		/// </summary>
 		/// <param name="output">The output buffer</param>
