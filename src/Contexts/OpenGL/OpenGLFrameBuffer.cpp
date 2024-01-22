@@ -208,7 +208,7 @@ namespace Elysium
 					m_colorAttachments[i] = Texture2D::Create(id, m_specification.Width, m_specification.Height, 
 															  (uint32_t)FBUtils::TextureFormatToGLInternalFormat(m_colorAttachmentSpecs[i].TextureFormat),
 															  (uint32_t)FBUtils::TextureFormatToGLFormat(m_colorAttachmentSpecs[i].TextureFormat),
-															  (uint32_t)(m_colorAttachmentSpecs[i].TextureFormat == FrameBufferTextureFormat::RED_F ? GL_FLOAT : GL_UNSIGNED_BYTE),
+															  (uint32_t)(((uint16_t)m_colorAttachmentSpecs[i].TextureFormat & (uint16_t)FrameBufferTextureFormat::FloatFormat) > 0 ? GL_FLOAT : GL_UNSIGNED_BYTE),
 															  (uint32_t)m_specification.Samples);
 
 					FBUtils::BindTexture(multisampled, m_colorAttachments[i]->GetRenderID());
@@ -218,7 +218,7 @@ namespace Elysium
 												(uint32_t)FBUtils::TextureFormatToGLFormat(m_colorAttachmentSpecs[i].TextureFormat),
 												m_specification.Width,
 												m_specification.Height, i,
-												(uint32_t)(m_colorAttachmentSpecs[i].TextureFormat == FrameBufferTextureFormat::RED_F ? GL_FLOAT : GL_UNSIGNED_BYTE));
+												(uint32_t)(((uint16_t)m_colorAttachmentSpecs[i].TextureFormat & (uint16_t)FrameBufferTextureFormat::FloatFormat) > 0 ? GL_FLOAT : GL_UNSIGNED_BYTE));
 				}
 				else
 				{

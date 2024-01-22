@@ -9,17 +9,21 @@
 namespace Elysium
 {
 	/// <summary>
-	/// Enum class representing a frame buffer texture format.
+	/// Enum representing a frame buffer texture format.
 	/// </summary>
-	enum class FrameBufferTextureFormat
+	enum class FrameBufferTextureFormat : uint16_t
 	{
 		None = 0,
 
-		RGBA8,
-		RGBA16F,
-		RED_INT,
-		RED_F,
-		DEPTH24STENCIL8,
+		ByteFormat = 1 << 1,
+		FloatFormat = 1 << 2,
+
+		RGBA8 = (1 << 3) | ByteFormat,
+		RGBA16F = (1 << 4) | FloatFormat,
+		RED_INT = (1 << 5) | ByteFormat,
+		RED_F = (1 << 6) | FloatFormat,
+
+		DEPTH24STENCIL8 = 1 << 7,
 
 		// Simplified Format
 		Depth = DEPTH24STENCIL8

@@ -49,6 +49,27 @@ namespace Elysium
 		GraphicsCalls::SetDepthTesting(true);
 	}
 
+	void RenderCommands::DrawTextures(const Shared<FrameBuffer>& output, const Shared<Shader>& drawShader, 
+									  const std::vector<Shared<Texture2D>>& textures)
+	{
+		GraphicsCalls::SetDepthTesting(false);
+		output->Bind();
+
+		s_data.m_vao->Bind();
+
+		drawShader->Bind();
+
+		for (uint32_t i = 0; i < textures.size(); ++i)
+			textures[i]->Bind(i);
+
+		GraphicsCalls::DrawTriangles(6);
+
+		drawShader->Unbind();
+
+		output->Unbind();
+		GraphicsCalls::SetDepthTesting(true);
+	}
+
 	void RenderCommands::DrawScreenShader(const Shared<FrameBuffer>& output, const Shared<Shader>& shader)
 	{
 		GraphicsCalls::SetDepthTesting(false);
