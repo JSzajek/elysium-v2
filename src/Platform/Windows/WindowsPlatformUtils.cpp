@@ -3,6 +3,7 @@
 
 #include "Elysium/Pipeline/Application.h"
 
+#include <ShlObj.h>
 #include <commdlg.h>
 #include <GLFW/glfw3.h>
 #define GLFW_EXPOSE_NATIVE_WIN32
@@ -35,6 +36,63 @@ namespace Elysium
 		{
 			return openfilename.lpstrFile;
 		}
+		return "";
+	}
+
+	std::string FileDialogs::OpenDirectory()
+	{
+		CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+
+		// Create the File Open dialog
+		IFileOpenDialog* pFileOpenDialog;
+		HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpenDialog));
+
+		if (SUCCEEDED(hr)) 
+		{
+			// Set options to allow the selection of folders
+			DWORD dwOptions;
+			pFileOpenDialog->GetOptions(&dwOptions);
+			pFileOpenDialog->SetOptions(dwOptions | FOS_PICKFOLDERS);
+
+			// Show the dialog
+			hr = pFileOpenDialog->Show(NULL);
+
+			if (SUCCEEDED(hr)) 
+			{
+				// Get the selected folder
+				IShellItem* pItem;
+				hr = pFileOpenDialog->GetResult(&pItem);
+
+				if (SUCCEEDED(hr)) 
+				{
+					PWSTR pszFilePath;
+					hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+
+					if (SUCCEEDED(hr)) 
+					{
+						// Get the required buffer size
+						int bufferSize = WideCharToMultiByte(CP_UTF8, 0, pszFilePath, -1, NULL, 0, NULL, NULL);
+
+						// Allocate a buffer for the converted string
+						std::string result(bufferSize, 0);
+
+						// Convert the wide string to multibyte (UTF-8) string
+						WideCharToMultiByte(CP_UTF8, 0, pszFilePath, -1, &result[0], bufferSize, NULL, NULL);
+
+						// Free the memory
+						CoTaskMemFree(pszFilePath);
+						pItem->Release();
+						pFileOpenDialog->Release();
+						CoUninitialize();
+
+						return result;
+					}
+					pItem->Release();
+				}
+			}
+			pFileOpenDialog->Release();
+		}
+		CoUninitialize();
 		return "";
 	}
 

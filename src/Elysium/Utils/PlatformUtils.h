@@ -17,6 +17,8 @@ namespace Elysium
 	public:
 		// These return empty strings if canceled
 		static std::string OpenFile(const char* filter);
+		static std::string OpenDirectory();
+
 		static std::string SaveFile(const char* filter);
 
 		static DialogResult YesNoMessage(const char* title, const char* message);
