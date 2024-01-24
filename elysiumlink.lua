@@ -23,3 +23,19 @@ function LinkElysium()
 		"{COPY} " .. '"' .. "%{cfg.targetdir}/../" .. "Elysium/*.pdb" .. '"' .. " %{cfg.targetdir}"
 	}
 end
+
+function ElysiumProjDep()
+	group "Dependencies"
+		include "vendor/premake"
+		include "Elysium/vendor/glfw"
+		include "Elysium/vendor/yaml-cpp"
+		include "Elysium/vendor/imgui_suite/imgui"
+		include "Elysium/vendor/imgui_suite/imguizmo"
+		include "Elysium/vendor/imgui_suite/imnodes"
+		include "Elysium/vendor/imgui_suite/imtexteditor"
+	group ""
+
+	group "Engine"
+		include "Elysium"
+	group ""
+end
