@@ -353,6 +353,9 @@ namespace Elysium
 
 			TextureFormat newFormat = format;
 
+			newFormat.Size.x = width;
+			newFormat.Size.y = height;
+
 			// Assumed unsigned bytes
 			newFormat.BitDepth = PixelBitDepth::Bit8U;
 			switch (nrComponents)
@@ -376,8 +379,10 @@ namespace Elysium
 			if (data)
 				stbi_image_free(data);
 		}
-
-		Initialize(format, data);
+		else
+		{
+			Initialize(format, data);
+		}
 	}
 
 	void OpenGLTexture2D::Initialize(const TextureFormat& format, const void* data)
