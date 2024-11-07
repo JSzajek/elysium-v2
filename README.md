@@ -3,6 +3,8 @@ An OpenGL Rendering Engine with an ImGui Interface.
 
 It hosts all the necessary features to develop simple desktop applications.
 
+This is a simplified version of the previous [Astra Engine](https://gitlab.com/jszajek/astra) to refocus the project towards desktop applications compared to specialized game engine requirements.
+
 **Disclaimer:** This implementation follows various tutorials referenced below and is mainly a personal exercise
 to learn about the involved api, pipelines, and algorithms. 
 
